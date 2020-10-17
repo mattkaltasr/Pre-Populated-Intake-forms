@@ -1,5 +1,7 @@
 # Pre-populated Intake Forms
 
+[![Build Status](https://drone.hdap.gatech.edu/api/badges/gt-cs6440-hit-fall2020/Pre-Populated-Intake-Forms/status.svg?ref=refs/heads/stable)](https://drone.hdap.gatech.edu/gt-cs6440-hit-fall2020/Pre-Populated-Intake-Forms)
+
 Intake forms are almost always filled out manually by patients even when the information required 
 is readily available in individual health records. This is both cumbersome for patients and increases 
 the chances of inaccuracy in reporting, particularly around existing conditions and medications. 
