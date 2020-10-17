@@ -1,0 +1,28 @@
+#### Frontend ####
+
+# dependencies
+/app/react/node_modules
+/app/react/.pnp
+/app/react/.pnp.js
+
+# testing
+/app/react/coverage
+
+# production
+/app/react/build
+
+# misc
+.DS_Store
+/app/react/.env.local
+/app/react/.env.development.local
+/app/react/.env.test.local
+/app/react/.env.production.local
+
+/app/react/npm-debug.log*
+/app/react/yarn-debug.log*
+/app/react/yarn-error.log*
+
+
+#### Backend ####
+/app/api/__pycache__/
+venv/
