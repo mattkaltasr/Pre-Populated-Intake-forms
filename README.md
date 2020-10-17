@@ -1,4 +1,5 @@
 # Pre-populated Intake Forms
+
 Intake forms are almost always filled out manually by patients even when the information required 
 is readily available in individual health records. This is both cumbersome for patients and increases 
 the chances of inaccuracy in reporting, particularly around existing conditions and medications. 
