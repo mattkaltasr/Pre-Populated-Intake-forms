@@ -52,6 +52,6 @@ volumes:
   temp: {}
 trigger:
   branch:
-  - deploy
+  - stable
   event:
   - push
