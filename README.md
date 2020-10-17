@@ -1,4 +1,21 @@
 # Pre-populated Intake Forms
+Intake forms are almost always filled out manually by patients even when the information required 
+is readily available in individual health records. This is both cumbersome for patients and increases 
+the chances of inaccuracy in reporting, particularly around existing conditions and medications. 
+
+The project team should build an intake form application that pulls from patient records 
+(represented as **[FHIR](https://www.hl7.org/fhir/)**) and pre-populates all relevant data common to intake forms, 
+from the perspective of a patient logging into a tele-health service.
+
+## Local build and deployment 
+
+### Pre-requisites
+* Python 3.8.5
+* NodeJS 14.6
+* nginx
+
+### Build and deployment steps
+TODO
 
 ## Authors
 

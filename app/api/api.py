@@ -1,16 +1,10 @@
-from flask import Flask, request
-from flask_cors import CORS
-
-import time
+from flask import Flask
+from flask import jsonify
 
 app = Flask(__name__)
-CORS(app)
 
+@app.route("/")
+def index():
+    return jsonify({"message": "Hello World!"})
 
-@app.route("/test", methods=["POST"])
-def test_post():
-
-    params = request.json.get("params")
-
-    return {"response": params}
 
