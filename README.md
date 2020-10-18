@@ -18,7 +18,40 @@ from the perspective of a patient logging into a tele-health service.
 * nginx
 
 ### Build and deployment steps
-TODO
+
+#### Python
+
+**Tip**: It's highly recommended that you use pipenv or virtualenv to manage your local python dependencies/environment.
+
+1. Install Python dependencies:
+
+        pip install -r requirements.txt
+
+2. Run the application server:
+
+        python python app/api/api.py
+   
+    You should see something like this (you will need the URL in this log to interact with the application):
+   
+        * Serving Flask app "api" (lazy loading)
+        * Environment: production
+          WARNING: This is a development server. Do not use it in a production deployment.
+          Use a production WSGI server instead.
+        * Debug mode: on
+        INFO:werkzeug: * Running on http://127.0.0.1:8000/ (Press CTRL+C to quit)
+        INFO:werkzeug: * Restarting with stat
+        WARNING:werkzeug: * Debugger is active!
+        INFO:werkzeug: * Debugger PIN: 366-108-563
+
+3. Test the application:
+
+        curl -X GET <URL_FROM_PREVIOUS_LOG_MESSAGE>
+  
+    You should receive the following response:
+    
+        {
+          "message": "Hello World!"
+        }
 
 ## Authors
 
