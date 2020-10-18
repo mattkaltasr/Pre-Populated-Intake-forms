@@ -3,7 +3,7 @@ FROM node:14.6 AS builder
 # Set working directory
 WORKDIR /frontend
 # Copy all files from current directory to working dir in image
-COPY react .
+COPY frontend .
 # install node modules and build assets
 RUN yarn install && yarn build
 
