@@ -4,8 +4,8 @@ from flask import jsonify
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
+@app.route("/api/hello")
+def hello():
     return jsonify({"message": "Hello World!"})
 
 # start the app
