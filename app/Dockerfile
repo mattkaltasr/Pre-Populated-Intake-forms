@@ -7,6 +7,9 @@ COPY frontend frontend
 COPY config config
 # install node modules and build assets
 WORKDIR /app/frontend
+# because our app is not at the root of the server
+ENV PUBLIC_URL="/pre-populated-intake-forms-app"
+# build the static assets
 RUN yarn install && yarn build
 
 
