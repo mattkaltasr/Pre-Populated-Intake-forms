@@ -25,7 +25,7 @@ from the perspective of a patient logging into a tele-health service.
 
 1. Install Python dependencies:
 
-        pip install -r requirements.txt
+        pip install -r app/api/requirements.txt
 
 2. Run the application server:
 

@@ -11,4 +11,4 @@ def hello():
 # start the app
 if '__main__' == __name__:
     logging.basicConfig(level=logging.DEBUG)
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=8086)

@@ -7,8 +7,6 @@ COPY frontend frontend
 COPY config config
 # install node modules and build assets
 WORKDIR /app/frontend
-# because our app is not at the root of the server
-ENV PUBLIC_URL="/pre-populated-intake-forms-app"
 # build the static assets
 RUN yarn install && yarn build
 
@@ -21,6 +19,6 @@ COPY --from=builder /app/frontend/build html
 COPY --from=builder /app/config config
 RUN mkdir -p config/logs
 
-# Container run nginx with global directives and daemon off
+# Containers run nginx with global directives and daemon off
 EXPOSE 80
-CMD ["nginx", "-c", "config/nginx.conf", "-p", "/app", "-g", "daemon off;"]
+CMD ["nginx", "-c", "config/nginx.dev.conf", "-p", "/app", "-g", "daemon off;"]
