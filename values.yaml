@@ -29,7 +29,7 @@ backend:
   port: 8086
   replicaCount: 1
   proxy:
-    incomingPath: /pre-populated-intake-forms-app/
+    incomingPath: /pre-populated-intake-forms-app-backend/
     containerPath: "/" # The empty string "" means use same as incomingPath, otherwise the value in the string will replace the value of incomingPath when traffic is sent to the application in the deployed container
   image:
     repository: gt-build.hdap.gatech.edu/pre-populated-intake-forms
