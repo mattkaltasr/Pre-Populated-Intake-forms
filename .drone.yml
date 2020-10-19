@@ -6,12 +6,21 @@ concurrency:
   
 steps:
 # Create Docker image and push to HDAP Docker registry
-- name: deploy_application_image
+- name: deploy_frontend_image
   image: plugins/docker
   settings:
     repo: gt-build.hdap.gatech.edu/pre-populated-intake-forms
     context: app
     dockerfile: app/Dockerfile
+    tags:
+      - latest
+
+- name: deploy_backend_image
+  image: plugins/docker
+  settings:
+    repo: gt-build.hdap.gatech.edu/pre-populated-intake-forms
+    context: app/api
+    dockerfile: app/api/Dockerfile
     tags:
       - latest
 
