@@ -13,7 +13,7 @@ function App() {
         <p>
           Are you on <a
             className="App-link"
-            href="https://reactjs.org"
+            href="https://www.hl7.org/fhir/"
             target="_blank"
             rel="noopener noreferrer"
           > FHIR</a>?
