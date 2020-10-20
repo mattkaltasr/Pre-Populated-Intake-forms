@@ -18,7 +18,7 @@ steps:
 - name: deploy_backend_image
   image: plugins/docker
   settings:
-    repo: gt-build.hdap.gatech.edu/pre-populated-intake-forms
+    repo: gt-build.hdap.gatech.edu/pre-populated-intake-forms-backend
     context: app/api
     dockerfile: app/api/Dockerfile
     tags:
