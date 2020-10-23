@@ -10,7 +10,20 @@ The project team should build an intake form application that pulls from patient
 (represented as **[FHIR](https://www.hl7.org/fhir/)**) and pre-populates all relevant data common to intake forms, 
 from the perspective of a patient logging into a tele-health service.
 
-## Local build and deployment 
+## Local build and deployment using Docker (RECOMMENDED)
+
+### Pre-requisites
+* docker-cli
+
+### Build and deployment steps
+
+Run the following commands:
+    
+    * cd app
+    * docker-compose build
+    * docker-compose up
+
+## Local build and deployment (~~Docker~~)
 
 ### Pre-requisites
 * Python 3.8.5
