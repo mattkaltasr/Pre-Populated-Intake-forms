@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/api/hello")
 def hello():
-    return jsonify({"message": "Hello World!"})
+    return jsonify({"words": ["Hello ", "World ", "!"]})
 
 # start the app
 if '__main__' == __name__:
