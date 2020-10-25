@@ -14,7 +14,7 @@ We will select specific unit test to thoroughly test our methods and components 
 
 ### 1.3 Adequacy Criterion
 
-In order for us to get adequate testing we will rely on ore IDE coverage tool to verify we have good line coverage's .This will allow us to see the coverage of testing thru all phases unit, ingratiation and if needed regression.We can use positive test plan and add in random negative test to insure we have functionality and structure covered completely.We will also add more complex test at the different levels to confirm the test qualities are good. In addition, we will apply what we learned from the lecture about __category partition__ and test the app on the boundaries as well since most of the failure of the app most likely will occur at the boundary test case.
+In order for us to get adequate testing we will rely on ore IDE coverage tool to verify we have good line coverage's .This will allow us to see the coverage of testing thru all phases unit, ingratiation and if needed regression.We can use positive test plan and add in random negative test to insure we have functionality and structure covered completely.We will also add more complex test at the different levels to confirm the test qualities are good. In addition, we will apply  __category partition__ and test the app on the boundaries as well since most of the failure of the app most likely will occur at the boundary test case.
 
 
 ### 1.4 Bug Tracking
