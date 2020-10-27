@@ -22,6 +22,9 @@ Run the following commands:
     * cd app
     * docker-compose build
     * docker-compose up
+    
+Start your favorite web browser and navigate to: 
+[http://localhost:8080/pre-populated-intake-forms-app/](http://localhost:8080/pre-populated-intake-forms-app/)
 
 ## Local build and deployment (~~Docker~~)
 
