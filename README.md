@@ -42,7 +42,7 @@ Run the following commands:
 
 2. Run the application server:
 
-        python python app/api/api.py
+        python app/api/api.py
    
     You should see something like this (you will need the URL in this log to interact with the application):
    
@@ -51,7 +51,7 @@ Run the following commands:
           WARNING: This is a development server. Do not use it in a production deployment.
           Use a production WSGI server instead.
         * Debug mode: on
-        INFO:werkzeug: * Running on http://127.0.0.1:8000/ (Press CTRL+C to quit)
+        INFO:werkzeug: * Running on http://127.0.0.1:8086/ (Press CTRL+C to quit)
         INFO:werkzeug: * Restarting with stat
         WARNING:werkzeug: * Debugger is active!
         INFO:werkzeug: * Debugger PIN: 366-108-563
@@ -63,7 +63,11 @@ Run the following commands:
     You should receive the following response:
     
         {
-          "message": "Hello World!"
+          "words": [
+            "Hello ", 
+            "World ", 
+            "!"
+          ]
         }
 
 ## Authors
