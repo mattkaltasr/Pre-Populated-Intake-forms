@@ -72,6 +72,11 @@ Start your favorite web browser and navigate to:
             "!"
           ]
         }
+    ##### API Endpoints
+    * Get all Patients
+    `<BASE_URL>/api/patients`
+    * Get Patient Personal Info by Id
+    `<BASE_URL>/api/patient/<id>`
 
 ## Authors
 
