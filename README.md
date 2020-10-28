@@ -61,7 +61,7 @@ Start your favorite web browser and navigate to:
 
 3. Test the application:
 
-        curl -X GET <URL_FROM_PREVIOUS_LOG_MESSAGE>
+        curl -X GET <URL_FROM_PREVIOUS_LOG_MESSAGE>/api/hello
   
     You should receive the following response:
     
