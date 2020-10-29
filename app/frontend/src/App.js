@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+
+import FormContainer from './components/containers/FormContainer';
+import TextInput from './components/formElements/TextInput';
+import Checkbox from './components/formElements/Checkbox';
+
 import './App.css';
 
 function App() {
@@ -28,22 +32,39 @@ function App() {
         )
   }, [])
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <p>
-              {words.map(word => word)}
-            </p>
-          </header>
+  return (
+        <div className="app-container">
+          {/** we may want some sort of nav bar at the top of the screen that shows the user's 
+           * current progress through the form - ie "12/16 required fields completed" - and 
+           * displays their name
+           */}
+          <FormContainer title="Patient Info"  key="form-group-0" renderFormComponents={() => {
+            return <div className="flex">
+                      <div className="flex flex-col" style={{flex: 1}}>
+                        <div className="flex">
+                          <TextInput placeholder="name" title="First" isRequired />
+                          <TextInput placeholder="name" title="Last" isRequired />
+                          <TextInput placeholder="initial" title="Middle" isRequired />
+                        </div>
+                        <div className="flex">
+                        <TextInput title="Address" isRequired grow/>
+                        </div>
+                      </div>
+                      <div className="flex flex-col" style={{ flex: 1 }}>
+                        {/** other fields here */}
+                      </div>
+                  </div>
+            }}
+          />
+          <FormContainer title="Medical History" key="form-group-1" renderFormComponents={() => {
+            return <div className="flex flex-col">
+              <Checkbox title="Are you sick?"/>
+            <Checkbox title="Were you ever sick?"/></div>
+            }}
+          />
         </div>
     );
-  }
+  
 }
 
 export default App;

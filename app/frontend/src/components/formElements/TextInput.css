@@ -1,0 +1,23 @@
+.input-field-outer {
+  position: relative;
+  padding: 0.5em;
+}
+
+.input-field-outer.grow {
+  flex: 1;
+}
+
+.input-title {
+  margin-bottom: 0.5em;
+}
+
+.input-field {
+  padding: 0.5em;
+  border-radius: 0.28em;
+  border: 1px solid lightgray;
+}
+
+
+.input-field:hover {
+  border: 1px solid gray;
+}
