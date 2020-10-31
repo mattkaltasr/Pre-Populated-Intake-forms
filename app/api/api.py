@@ -4,6 +4,11 @@ from flask import Flask
 from flask import jsonify
 from fhirclient import client
 from fhirclient.models.patient import Patient
+from fhirclient.models.humanname import HumanName
+from fhirclient.models.contactpoint import ContactPoint
+from fhirclient.models.fhirdate import FHIRDate
+from fhirclient.models.medicationrequest import MedicationRequest
+from fhirclient.models.fhirreference import FHIRReference
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from requests.exceptions import HTTPError
@@ -173,13 +178,60 @@ def getPatient(id):
         return jsonify({'error': 'something really bad has happened!'})
 
 #TODO Get Medical history by patient id
+
 #TODO Get Medications by patient id
+@app.route('/api/medications/<id>', methods=['GET'])
+def getMedications(id):
+    smart = _get_smart()
+
+    try:
+        reference = FHIRReference()
+        reference.reference = "Patient/".join(str(id))
+        print(reference.reference)
+        p_search = MedicationRequest.where(struct={'subject': "Patient/1e19bb7a-d990-4924-9fae-be84f19c53c1"})
+        p_patients = p_search.perform_resources(smart.server)
+        print(p_patients)
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
+                                    not valid there'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 #TODO Get allergies by patient id
 #TODO Get Health habits (alcohol use, smoking, drug use)
 #TODO Get Family Medical History
 
 #TODO POST - Create a Test Patient with all possible details
+@app.route('/api/create-patient', methods=['POST'])
+def createPatient():
+    smart = _get_smart()
+    try:
+        # Create Patient
+        new_patient = Patient()
 
+        # Name
+        human_name = HumanName()
+        human_name.family = 'doe'
+        human_name.use = 'official'
+        human_name.given = ['john']
+        new_patient.name = [human_name]
+
+        # contactpoint
+        contact_point = ContactPoint()
+        contact_point.system = "phone"
+        contact_point.value = '123-456-9999'
+        new_patient.telecom = [contact_point]
+
+        result = new_patient.create(server=smart.server)
+        print(result)
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
+                                    not valid there'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 
 # start the app
 if '__main__' == __name__:
