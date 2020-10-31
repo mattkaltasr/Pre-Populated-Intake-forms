@@ -189,8 +189,8 @@ def getMedications(id):
         reference.reference = "Patient/".join(str(id))
         print(reference.reference)
         p_search = MedicationRequest.where(struct={'subject': "Patient/1e19bb7a-d990-4924-9fae-be84f19c53c1"})
-        p_patients = p_search.perform_resources(smart.server)
-        print(p_patients)
+        p_medications = p_search.perform_resources(smart.server)
+        print(p_medications)
     except FHIRValidationError:
         # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
         return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
