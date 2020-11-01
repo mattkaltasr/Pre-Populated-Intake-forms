@@ -20,6 +20,9 @@ smart_defaults = {
 # Flask app setup
 app = Flask(__name__)
 
+from flask_cors import CORS, cross_origin
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 # Creates a FHIRClient object and returns it
 def _get_smart():
     return client.FHIRClient(settings=smart_defaults)
@@ -72,8 +75,10 @@ def get_patients():
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({'error': 'something really bad has happened!'})
 
+
 # Get Patient's Personal Info by Id
 @app.route('/api/patient/<id>', methods=['GET'])
+@cross_origin()
 def getPatient(id):
     smart = _get_smart()
 

@@ -1,6 +1,5 @@
 .app-container {
   padding: 2em;
-  /* min-height: 100vh; */
 }
 
 
@@ -14,5 +13,5 @@
 }
 
 .flex-col{
-  flex-direction: column !important;
+  flex-direction: column;
 }

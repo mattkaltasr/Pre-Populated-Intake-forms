@@ -1,70 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import FormContainer from './components/containers/FormContainer';
-import TextInput from './components/formElements/TextInput';
-import Checkbox from './components/formElements/Checkbox';
+import PatientInfo from "./components/forms/PatientInfo";
+import { loadPatientById } from "./util/apiHelpers";
 
-import './App.css';
+import "./App.css";
+
+// fritz doyle
+const TEST_PATIENT_ID = "fb7a640d-1f8e-4320-9e07-20f27f8e18f2";
 
 function App() {
   const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [words, setWords] = useState([]);
+  const [isLoading, setLoading] = useState(false); // we should show a loading message
 
-  // Note: the empty deps array [] means
-  // this useEffect will run once
-  // similar to componentDidMount()
+  const [patientData, setPatientData] = useState({});
+
   useEffect(() => {
-    fetch("/pre-populated-intake-forms-app-backend/api/hello")
-        .then(res => res.json())
-        .then(
-            (result) => {
-              setIsLoaded(true);
-              setWords(result.words);
-            },
-            // Note: it's important to handle errors here
-            // instead of a catch() block so that we don't swallow
-            // exceptions from actual bugs in components.
-            (error) => {
-              setIsLoaded(true);
-              setError(error);
-            }
-        )
-  }, [])
+    loadPatientById({
+      patientId: TEST_PATIENT_ID,
+      setData: (data) => {
+        const [result] = data || [];
+        if (result) {
+          setPatientData(result);
+        }
+      },
+      setError,
+      setLoading,
+    });
+  }, []);
 
   return (
-        <div className="app-container">
-          {/** we may want some sort of nav bar at the top of the screen that shows the user's 
-           * current progress through the form - ie "12/16 required fields completed" - and 
-           * displays their name
-           */}
-          <FormContainer title="Patient Info"  key="form-group-0" renderFormComponents={() => {
-            return <div className="flex">
-                      <div className="flex flex-col" style={{flex: 1}}>
-                        <div className="flex">
-                          <TextInput placeholder="name" title="First" isRequired />
-                          <TextInput placeholder="name" title="Last" isRequired />
-                          <TextInput placeholder="initial" title="Middle" isRequired />
-                        </div>
-                        <div className="flex">
-                        <TextInput title="Address" isRequired grow/>
-                        </div>
-                      </div>
-                      <div className="flex flex-col" style={{ flex: 1 }}>
-                        {/** other fields here */}
-                      </div>
-                  </div>
-            }}
-          />
-          <FormContainer title="Medical History" key="form-group-1" renderFormComponents={() => {
-            return <div className="flex flex-col">
-              <Checkbox title="Are you sick?"/>
-            <Checkbox title="Were you ever sick?"/></div>
-            }}
-          />
-        </div>
-    );
-  
+    <div className="app-container">
+      <PatientInfo patientData={patientData} />
+    </div>
+  );
 }
 
 export default App;
