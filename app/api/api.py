@@ -239,6 +239,7 @@ def getMedications(id):
 #TODO Get Family Medical History
 
 #TODO POST - Create a Test Patient with all possible details
+#WIP
 @app.route('/api/create-patient', methods=['POST'])
 def createPatient():
     smart = _get_smart()
