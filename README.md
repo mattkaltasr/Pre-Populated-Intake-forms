@@ -75,8 +75,10 @@ Start your favorite web browser and navigate to:
     ##### API Endpoints
     * Get all Patients
     `<BASE_URL>/api/patients`
-    * Get Patient Personal Info by Id
+    * Get Patient Personal Info by Patient Id
     `<BASE_URL>/api/patient/<id>`
+    * Get Medications by Patient Id
+    `<BASE_URL>/api/medications/<id>`
 
 ## Authors
 
