@@ -20,9 +20,6 @@ smart_defaults = {
 # Flask app setup
 app = Flask(__name__)
 
-from flask_cors import CORS, cross_origin
-app.config['CORS_HEADERS'] = 'Content-Type'
-
 # Creates a FHIRClient object and returns it
 def _get_smart():
     return client.FHIRClient(settings=smart_defaults)
@@ -78,7 +75,6 @@ def get_patients():
 
 # Get Patient's Personal Info by Id
 @app.route('/api/patient/<id>', methods=['GET'])
-@cross_origin()
 def getPatient(id):
     smart = _get_smart()
 
