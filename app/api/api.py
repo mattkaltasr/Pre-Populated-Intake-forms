@@ -78,6 +78,7 @@ def get_patients():
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({'error': 'something really bad has happened!'})
 
+
 # Get Patient's Personal Info by Id
 @app.route('/api/patient/<id>', methods=['GET'])
 def getPatient(id):

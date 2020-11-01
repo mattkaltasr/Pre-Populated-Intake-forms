@@ -1,0 +1,11 @@
+
+.checkbox-outer {
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0.5em;
+  padding: 0.5em;
+}
+
+.checkbox-outer:last-child {
+  margin-bottom: 0;
+}

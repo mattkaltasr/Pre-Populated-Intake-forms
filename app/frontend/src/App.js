@@ -1,49 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+
+import PatientInfo from "./components/forms/PatientInfo";
+import { loadPatientById } from "./util/apiHelpers";
+
+import "./App.css";
+
+// fritz doyle
+const TEST_PATIENT_ID = "fb7a640d-1f8e-4320-9e07-20f27f8e18f2";
 
 function App() {
   const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [words, setWords] = useState([]);
+  const [isLoading, setLoading] = useState(false); // we should show a loading message
 
-  // Note: the empty deps array [] means
-  // this useEffect will run once
-  // similar to componentDidMount()
+  const [patientData, setPatientData] = useState({});
+
   useEffect(() => {
-    fetch("/pre-populated-intake-forms-app-backend/api/hello")
-        .then(res => res.json())
-        .then(
-            (result) => {
-              setIsLoaded(true);
-              setWords(result.words);
-            },
-            // Note: it's important to handle errors here
-            // instead of a catch() block so that we don't swallow
-            // exceptions from actual bugs in components.
-            (error) => {
-              setIsLoaded(true);
-              setError(error);
-            }
-        )
-  }, [])
+    loadPatientById({
+      patientId: TEST_PATIENT_ID,
+      setData: (data) => {
+        const [result] = data || [];
+        if (result) {
+          setPatientData(result);
+        }
+      },
+      setError,
+      setLoading,
+    });
+  }, []);
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <p>
-              {words.map(word => word)}
-            </p>
-          </header>
-        </div>
-    );
-  }
+  return (
+    <div className="app-container">
+      <PatientInfo patientData={patientData} />
+    </div>
+  );
 }
 
 export default App;
