@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import Checkbox from "../formElements/Checkbox";
 import Button from "../formElements/Button";
@@ -128,6 +129,10 @@ const ConsentForm = ({ handleConsentAgree }) => {
       </div>
     </div>
   );
+};
+
+ConsentForm.propTypes = {
+  handleConsentAgree: PropTypes.func.isRequired,
 };
 
 export default ConsentForm;

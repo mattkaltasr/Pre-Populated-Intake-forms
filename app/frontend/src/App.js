@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-import PatientInfo from "./components/forms/PatientInfo";
-import VisitPreparation from "./components/forms/VisitPreparation";
-import { loadPatientById } from "./util/apiHelpers";
-import ConsentForm from "./components/forms/ConsentForm";
+import IntakeForm from "./components/pages/IntakeForm";
+import ConsentForm from "./components/pages/ConsentForm";
 
 import "./App.css";
 
@@ -15,51 +13,18 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      error: null,
-      isLoading: false,
-      selectedUserId: null,
+      selectedUserId: TEST_PATIENT_ID,
       didConsent: false,
-      patientData: {},
     };
-
-    this.loadPatientData = this.loadPatientData.bind(this);
-  }
-
-  async loadPatientData() {
-    loadPatientById({
-      patientId: TEST_PATIENT_ID,
-      setData: (data) => {
-        const [result] = data || [];
-        if (result) {
-          this.setState({
-            patientData: result,
-          });
-        }
-      },
-      setError: (err) => this.setState({ error: err }),
-      setLoading: () => this.setState({ isLoading: false }),
-    });
   }
 
   render() {
-    const {
-      error,
-      isLoading,
-      patientData,
-      selectedUserId,
-      didConsent,
-    } = this.state;
+    const { selectedUserId, didConsent } = this.state;
 
     return (
       <div className="app-container">
         {didConsent ? (
-          <div>
-            <VisitPreparation
-              patientData={patientData}
-              handleSubmit={() => {}}
-            />
-            <PatientInfo patientData={patientData} />
-          </div>
+          <IntakeForm patientId={selectedUserId} />
         ) : (
           <ConsentForm
             handleConsentAgree={(val) => this.setState({ didConsent: val })}
