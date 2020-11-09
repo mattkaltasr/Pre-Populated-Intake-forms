@@ -4,8 +4,14 @@
   border-radius: 0.28em;
 }
 
+
 .input-field-outer.grow {
   flex: 1;
+  
+}
+
+.input-field-outer.small {
+  max-width: 100px;
 }
 
 .input-field-outer.different {
@@ -14,13 +20,19 @@
 
 .input-title {
   margin-bottom: 0.25em;
+  font-size: 0.9em;
   position: relative;
+}
+
+.input-title.small {
+  font-size: 0.8em;
 }
 
 .input-field {
   padding: 0.5em;
   border-radius: 0.28em;
   border: 1px solid lightgray;
+  font-family: 'DM Sans', Sans-Serif;
 }
 
 

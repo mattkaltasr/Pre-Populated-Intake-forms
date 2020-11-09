@@ -15,30 +15,24 @@ const TextInput = ({
   fieldName,
   grow,
   setFieldValue,
-  valueDiffers,
-  small,
-  ...inputProps
 }) => {
   return (
     <div
       className={classNames("flex flex-col input-field-outer", {
         grow: !!grow,
-        different: valueDiffers,
-        small,
       })}
       style={{
         margin: "auto 0 auto 0",
       }}
     >
-      <FormLabel title={title} isRequired={isRequired} />
-      <input
+      <FormLabel title={title} isRequired={isRequired} small />
+      <textarea
         className="input-field"
         value={value}
         onChange={({ target: { value: nextValue } }) =>
           setFieldValue(fieldName, nextValue)
         }
         placeholder={placeholder || _.lowerCase(title)}
-        {...inputProps} /** in case we want to make this a `number` field, etc */
       />
     </div>
   );
@@ -51,8 +45,6 @@ TextInput.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   grow: PropTypes.bool,
   isRequired: PropTypes.bool,
-  valueDiffers: PropTypes.bool,
-  small: PropTypes.bool,
   placeholder: PropTypes.string,
 };
 
@@ -61,8 +53,6 @@ TextInput.defaultProps = {
   grow: false,
   placeholder: null,
   value: null,
-  valueDiffers: false,
-  small: false,
 };
 
 export default TextInput;

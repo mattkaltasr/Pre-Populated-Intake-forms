@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import PatientInfo from "./components/forms/PatientInfo";
+import VisitPreparation from "./components/forms/VisitPreparation";
 import { loadPatientById } from "./util/apiHelpers";
 
 import "./App.css";
@@ -8,31 +9,46 @@ import "./App.css";
 // fritz doyle
 const TEST_PATIENT_ID = "fb7a640d-1f8e-4320-9e07-20f27f8e18f2";
 
-function App() {
-  const [error, setError] = useState(null);
-  const [isLoading, setLoading] = useState(false); // we should show a loading message
+class App extends React.Component {
+  constructor(props) {
+    super(props);
 
-  const [patientData, setPatientData] = useState({});
+    this.state = {
+      error: null,
+      isLoading: false,
+      selectedUserId: null,
+      patientData: {},
+    };
 
-  useEffect(() => {
+    this.loadPatientData = this.loadPatientData.bind(this);
+  }
+
+  async loadPatientData() {
     loadPatientById({
       patientId: TEST_PATIENT_ID,
       setData: (data) => {
         const [result] = data || [];
         if (result) {
-          setPatientData(result);
+          this.setState({
+            patientData: result,
+          });
         }
       },
-      setError,
-      setLoading,
+      setError: (err) => this.setState({ error: err }),
+      setLoading: () => this.setState({ isLoading: false }),
     });
-  }, []);
+  }
 
-  return (
-    <div className="app-container">
-      <PatientInfo patientData={patientData} />
-    </div>
-  );
+  render() {
+    const { error, isLoading, patientData, selectedUserId } = this.state;
+
+    return (
+      <div className="app-container">
+        <VisitPreparation patientData={patientData} handleSubmit={() => {}} />
+        <PatientInfo patientData={patientData} />
+      </div>
+    );
+  }
 }
 
 export default App;

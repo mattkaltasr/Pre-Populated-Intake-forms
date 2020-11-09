@@ -19,7 +19,7 @@ const PatientInfo = ({ patientData }) => {
     <FormContainer
       title="Patient Info"
       key="form-group-0"
-      renderFormComponents={() => (
+      formComponents={
         <div className="flex" style={{ flex: 1, flexWrap: "wrap" }}>
           <div className="flex flex-col" style={{ flex: 1 }}>
             <div className="flex" style={{ flexWrap: "wrap" }}>
@@ -36,6 +36,15 @@ const PatientInfo = ({ patientData }) => {
                 }
               />
               <TextInput
+                placeholder="initial"
+                title="Middle"
+                isRequired
+                small
+                grow
+                setFieldValue={setFieldValue}
+                value={patientAnswers.middleInitial}
+              />
+              <TextInput
                 placeholder="name"
                 title="Last"
                 fieldName="lastName"
@@ -44,14 +53,6 @@ const PatientInfo = ({ patientData }) => {
                 setFieldValue={setFieldValue}
                 value={patientAnswers.lastName}
                 valueDiffers={patientAnswers.lastName !== patientData.lastName}
-              />
-              <TextInput
-                placeholder="initial"
-                title="Middle"
-                isRequired
-                grow
-                setFieldValue={setFieldValue}
-                value={patientAnswers.middleInitial}
               />
             </div>
             <div className="flex">
@@ -65,7 +66,7 @@ const PatientInfo = ({ patientData }) => {
                 valueDiffers={patientAnswers.address !== patientData.address}
               />
             </div>
-            <div className="flex">
+            <div className="flex" style={{ flexWrap: "wrap" }}>
               <TextInput
                 title="City"
                 fieldName="city"
@@ -89,7 +90,7 @@ const PatientInfo = ({ patientData }) => {
               />
             </div>
           </div>
-          <div className="flex flex-col" style={{ flex: 1 }}>
+          <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
             <div className="flex">
               <TextInput
                 placeholder="make this a date field"
@@ -110,7 +111,7 @@ const PatientInfo = ({ patientData }) => {
                 ]}
               />
             </div>
-            <div className="flex">
+            <div className="flex" style={{ flexWrap: "wrap" }}>
               <RadioButtonGroup
                 title="Relationship Status"
                 setFieldValue={setFieldValue}
@@ -150,7 +151,7 @@ const PatientInfo = ({ patientData }) => {
                 value={patientAnswers.homePhone}
               />
             </div>
-            <div className="flex">
+            <div className="flex" style={{ flexWrap: "wrap" }}>
               <TextInput
                 title="Phone (Mobile)"
                 fieldName="mobilePhone"
@@ -175,7 +176,7 @@ const PatientInfo = ({ patientData }) => {
             </div>
           </div>
         </div>
-      )}
+      }
     />
   );
 };
