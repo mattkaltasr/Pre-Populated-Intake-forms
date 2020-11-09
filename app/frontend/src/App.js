@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import PatientInfo from "./components/forms/PatientInfo";
 import VisitPreparation from "./components/forms/VisitPreparation";
 import { loadPatientById } from "./util/apiHelpers";
+import ConsentForm from "./components/forms/ConsentForm";
 
 import "./App.css";
 
@@ -17,6 +18,7 @@ class App extends React.Component {
       error: null,
       isLoading: false,
       selectedUserId: null,
+      didConsent: false,
       patientData: {},
     };
 
@@ -40,12 +42,29 @@ class App extends React.Component {
   }
 
   render() {
-    const { error, isLoading, patientData, selectedUserId } = this.state;
+    const {
+      error,
+      isLoading,
+      patientData,
+      selectedUserId,
+      didConsent,
+    } = this.state;
 
     return (
       <div className="app-container">
-        <VisitPreparation patientData={patientData} handleSubmit={() => {}} />
-        <PatientInfo patientData={patientData} />
+        {didConsent ? (
+          <div>
+            <VisitPreparation
+              patientData={patientData}
+              handleSubmit={() => {}}
+            />
+            <PatientInfo patientData={patientData} />
+          </div>
+        ) : (
+          <ConsentForm
+            handleConsentAgree={(val) => this.setState({ didConsent: val })}
+          />
+        )}
       </div>
     );
   }

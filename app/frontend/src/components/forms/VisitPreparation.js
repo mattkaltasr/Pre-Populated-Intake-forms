@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import FormContainer from "../containers/FormContainer";
 import TextArea from "../formElements/TextArea";
-import SubmitButton from "../formElements/SubmitButton";
+import SubmitButton from "../formElements/Button";
 
 const PatientInfo = ({ patientData, handleSubmit }) => {
   const [patientAnswers, setAnswers] = React.useState({ ...patientData });
