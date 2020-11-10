@@ -14,7 +14,7 @@ class App extends React.Component {
 
     this.state = {
       selectedUserId: TEST_PATIENT_ID,
-      didConsent: true,
+      didConsent: false,
     };
   }
 
