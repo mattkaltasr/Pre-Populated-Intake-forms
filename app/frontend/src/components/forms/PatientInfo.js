@@ -95,6 +95,7 @@ const PatientInfo = ({ patientData }) => {
               <TextInput
                 placeholder="make this a date field"
                 title="Date of Birth"
+                fieldName="birthDate"
                 setFieldValue={setFieldValue}
                 value={patientAnswers.birthDate}
               />

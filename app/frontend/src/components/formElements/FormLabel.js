@@ -14,7 +14,7 @@ const FormLabel = ({ title, isRequired, small }) => (
 );
 
 FormLabel.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   isRequired: PropTypes.bool,
   small: PropTypes.bool,
 };

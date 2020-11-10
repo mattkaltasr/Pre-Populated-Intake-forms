@@ -7,6 +7,8 @@ import PatientInfo from "../forms/PatientInfo";
 
 const IntakeForm = ({ patientId }) => {
   const [patientData, setPatientData] = React.useState({});
+  const [patientAnswers, setPatientAnswers] = React.useState({});
+
   const [error, setError] = React.useState(null);
   const [isLoading, setLoading] = React.useState(false);
 
@@ -30,7 +32,18 @@ const IntakeForm = ({ patientId }) => {
 
   return (
     <>
-      <VisitPreparation patientData={patientData} handleSubmit={() => {}} />
+      <VisitPreparation
+        patientData={patientData}
+        handleSubmit={(answers) => {
+          setPatientAnswers({
+            ...patientAnswers,
+            visitPreparation: {
+              ...patientAnswers.visitPreparation,
+              ...answers,
+            },
+          });
+        }}
+      />
       <PatientInfo patientData={patientData} />
     </>
   );

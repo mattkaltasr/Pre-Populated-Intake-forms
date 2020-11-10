@@ -33,7 +33,7 @@ const TextInput = ({
       <FormLabel title={title} isRequired={isRequired} />
       <input
         className="input-field"
-        value={value}
+        value={value || ""}
         onChange={({ target: { value: nextValue } }) =>
           setFieldValue(fieldName, nextValue)
         }
@@ -45,7 +45,7 @@ const TextInput = ({
 };
 
 TextInput.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   setFieldValue: PropTypes.func.isRequired,
   fieldName: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

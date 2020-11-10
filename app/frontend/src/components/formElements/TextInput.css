@@ -35,6 +35,14 @@
   font-family: 'DM Sans', Sans-Serif;
 }
 
+.input-field.disabled {
+  cursor: not-allowed;
+}
+
+.input-field:hover.disabled {
+  border: 1px solid lightgray;
+}
+
 
 .input-field:hover {
   border: 1px solid gray;

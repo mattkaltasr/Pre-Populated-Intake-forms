@@ -4,9 +4,11 @@ import PropTypes from "prop-types";
 import FormContainer from "../containers/FormContainer";
 import TextArea from "../formElements/TextArea";
 import SubmitButton from "../formElements/Button";
+import RadioButtonGroup from "../formElements/RadioButtonGroup";
 
 const PatientInfo = ({ patientData, handleSubmit }) => {
   const [patientAnswers, setAnswers] = React.useState({ ...patientData });
+  const [inactiveInputs, setInactiveInputs] = React.useState({});
 
   React.useEffect(() => {
     setAnswers({ ...patientData });
@@ -14,6 +16,29 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
 
   const setFieldValue = (key, value) =>
     setAnswers({ ...patientAnswers, [key]: value });
+
+  const BinaryRadioButtonGroup = ({ fieldName }) => (
+    <RadioButtonGroup
+      value={!!inactiveInputs[fieldName]}
+      setFieldValue={(field, value) => {
+        setInactiveInputs({
+          ...inactiveInputs,
+          [fieldName]: value,
+        });
+      }}
+      fieldName={fieldName}
+      options={[
+        {
+          label: "Yes",
+          value: true,
+        },
+        {
+          label: "No",
+          value: false,
+        },
+      ]}
+    />
+  );
 
   return (
     <FormContainer
@@ -35,9 +60,18 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
               />
               <TextArea
                 placeholder="text"
-                title="Do you have any specific requests for new medications, refills, or tests?"
+                title={
+                  <div className="flex flex-col">
+                    <span>
+                      Do you have any specific requests for new medications,
+                      refills, or tests?
+                    </span>
+                    <BinaryRadioButtonGroup fieldName="hasRequests" />
+                  </div>
+                }
                 fieldName="patientRequests"
                 grow
+                disabled={!inactiveInputs.hasRequests}
                 setFieldValue={setFieldValue}
                 value={patientAnswers.patientRequests}
               />
@@ -61,7 +95,16 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
               />
               <TextArea
                 placeholder="text"
-                title="Is there anything else you want to remember for your appointment?"
+                title={
+                  <div className="flex flex-col">
+                    <span>
+                      Is there anything else you want to remember for your
+                      appointment?
+                    </span>
+                    <BinaryRadioButtonGroup fieldName="hasAdditionalComments" />
+                  </div>
+                }
+                disabled={!inactiveInputs.hasAdditionalComments}
                 fieldName="patientOther"
                 grow
                 setFieldValue={setFieldValue}
@@ -70,7 +113,7 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
               <div style={{ flex: 1 }}></div>
             </div>
           </div>
-          <div style={{ margin: "auto" }}>
+          <div style={{ margin: "1em auto auto auto" }}>
             <SubmitButton onClick={handleSubmit} />
           </div>
         </div>
@@ -80,9 +123,9 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
 };
 
 PatientInfo.propTypes = {
-  // eslint-disable-next-line no-undef
   // eslint-disable-next-line react/forbid-prop-types
   patientData: PropTypes.object.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
 };
 
 export default PatientInfo;
