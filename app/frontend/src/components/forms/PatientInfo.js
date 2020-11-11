@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import FormContainer from "../containers/FormContainer";
 import TextInput from "../formElements/TextInput";
 import RadioButtonGroup from "../formElements/RadioButtonGroup";
+import DateField from "../formElements/DateField";
+import PhoneInput from "../formElements/PhoneInput";
 
 const PatientInfo = ({ patientData }) => {
   const [patientAnswers, setAnswers] = React.useState({ ...patientData });
@@ -58,10 +60,9 @@ const PatientInfo = ({ patientData }) => {
             <div className="flex">
               <TextInput
                 title="Address"
-                fieldName="address"
                 isRequired
                 grow
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("address", value)}
                 value={patientAnswers.address}
                 valueDiffers={patientAnswers.address !== patientData.address}
               />
@@ -69,35 +70,32 @@ const PatientInfo = ({ patientData }) => {
             <div className="flex" style={{ flexWrap: "wrap" }}>
               <TextInput
                 title="City"
-                fieldName="city"
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("city", value)}
                 value={patientAnswers.city}
                 grow
               />
               <TextInput
                 title="State"
-                fieldName="state"
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("state", value)}
                 value={patientAnswers.state}
                 grow
+                small
               />
               <TextInput
                 title="Postal Code"
-                fieldName="postalCode"
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("postalCode", value)}
                 value={patientAnswers.postalCode}
                 grow
+                small
               />
             </div>
           </div>
           <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
             <div className="flex">
-              <TextInput
-                placeholder="make this a date field"
+              <DateField
                 title="Date of Birth"
-                fieldName="birthDate"
-                setFieldValue={setFieldValue}
                 value={patientAnswers.birthDate}
+                onChange={(date) => setFieldValue("birthDate", date)}
               />
               <RadioButtonGroup
                 title="Gender"
@@ -143,20 +141,18 @@ const PatientInfo = ({ patientData }) => {
                 ]}
                 value={patientAnswers.relationshipStatus}
               />
-              <TextInput
+              <PhoneInput
                 placeholder="initial"
                 title="Phone (Home)"
-                fieldName="homePhone"
                 grow
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("homePhone", value)}
                 value={patientAnswers.homePhone}
               />
             </div>
             <div className="flex" style={{ flexWrap: "wrap" }}>
-              <TextInput
+              <PhoneInput
                 title="Phone (Mobile)"
-                fieldName="mobilePhone"
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("mobilePhone", value)}
                 value={patientAnswers.mobilePhone}
                 grow
               />

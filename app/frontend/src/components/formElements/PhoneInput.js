@@ -2,12 +2,14 @@ import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
 import _ from "lodash";
+import DatePicker from "react-datepicker";
 
 import FormLabel from "./FormLabel";
 
 import "./TextInput.css";
+import PhoneInput from "react-phone-input-2";
 
-const TextInput = ({
+const DateField = ({
   title,
   value,
   isRequired,
@@ -17,6 +19,7 @@ const TextInput = ({
   valueDiffers,
   small,
   error,
+  ...inputProps
 }) => {
   return (
     <div
@@ -31,17 +34,23 @@ const TextInput = ({
       }}
     >
       <FormLabel title={title} isRequired={isRequired} />
-      <input
+      <PhoneInput
         className="input-field"
-        value={value || ""}
-        onChange={({ target: { value: nextValue } }) => onChange(nextValue)}
-        placeholder={placeholder || _.lowerCase(title)}
+        country="us"
+        value={value}
+        onChange={(phone) => onChange(phone)}
+        disableCountryCode
+        inputProps={
+          {
+            // className: "input-field",
+          }
+        }
       />
     </div>
   );
 };
 
-TextInput.propTypes = {
+DateField.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -52,7 +61,7 @@ TextInput.propTypes = {
   placeholder: PropTypes.string,
 };
 
-TextInput.defaultProps = {
+DateField.defaultProps = {
   isRequired: false,
   grow: false,
   placeholder: null,
@@ -61,4 +70,4 @@ TextInput.defaultProps = {
   small: false,
 };
 
-export default TextInput;
+export default DateField;

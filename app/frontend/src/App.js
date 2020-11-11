@@ -3,6 +3,9 @@ import React from "react";
 import IntakeForm from "./components/pages/IntakeForm";
 import ConsentForm from "./components/pages/ConsentForm";
 
+import "react-datepicker/dist/react-datepicker.css";
+import "react-phone-input-2/lib/style.css";
+
 import "./App.css";
 
 // fritz doyle
@@ -14,7 +17,7 @@ class App extends React.Component {
 
     this.state = {
       selectedUserId: TEST_PATIENT_ID,
-      didConsent: false,
+      didConsent: true,
     };
   }
 
