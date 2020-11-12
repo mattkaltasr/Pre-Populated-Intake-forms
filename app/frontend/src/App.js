@@ -41,11 +41,14 @@ function App() {
         setLoading,
       });
     }
-
-    if (error) {
-      alert('PatientId does not exist.')
-    }
   }, [patientId]);
+
+  useEffect(() => {
+    if (error) {
+      alert('Patient ID does not exist.');
+      setError(null);
+    }
+  }, [error]);
 
   return (
     <div className="app-container">
