@@ -26,7 +26,7 @@ class App extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  async handleSubmit(e) {
+  handleSubmit(e) {
     const { patientIdText } = this.state;
     e.preventDefault();
 
