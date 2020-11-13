@@ -17,6 +17,7 @@ const PatientInfo = ({ patientData }) => {
   const setFieldValue = (key, value) =>
     setAnswers({ ...patientAnswers, [key]: value });
 
+  console.log(patientAnswers);
   return (
     <FormContainer
       title="Patient Info"
@@ -90,7 +91,11 @@ const PatientInfo = ({ patientData }) => {
             <div className="flex">
               <DateField
                 title="Date of Birth"
-                value={patientAnswers.birthDate}
+                value={
+                  patientAnswers.birthDate
+                    ? new Date(patientAnswers.birthDate)
+                    : null
+                }
                 onChange={(date) => setFieldValue("birthDate", date)}
               />
               <RadioButtonGroup

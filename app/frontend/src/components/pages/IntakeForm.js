@@ -6,7 +6,7 @@ import VisitPreparation from "../forms/VisitPreparation";
 import PatientInfo from "../forms/PatientInfo";
 import MedicalHistory from "../forms/MedicalHistory";
 
-const IntakeForm = ({ patientId }) => {
+const IntakeForm = ({ selectedPatientId }) => {
   const [patientData, setPatientData] = React.useState({});
   const [patientAnswers, setPatientAnswers] = React.useState({});
 
@@ -14,22 +14,20 @@ const IntakeForm = ({ patientId }) => {
   const [isLoading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    loadPatientById({
-      patientId,
-      setData: (data) => {
-        const [result] = data || [];
-        if (result) {
-          setPatientData(result);
-        }
-      },
-      setError,
-      setLoading,
-    });
-  }, [patientId]);
-
-  if (error || isLoading) {
-    console.log("handle these");
-  }
+    if (selectedPatientId) {
+      loadPatientById({
+        patientId: selectedPatientId,
+        setData: (data) => {
+          const [result] = data || [];
+          if (result) {
+            setPatientData(result);
+          }
+        },
+        setError,
+        setLoading,
+      });
+    }
+  }, [selectedPatientId]);
 
   return (
     <>
@@ -52,7 +50,11 @@ const IntakeForm = ({ patientId }) => {
 };
 
 IntakeForm.propTypes = {
-  patientId: PropTypes.string.isRequired,
+  selectedPatientId: PropTypes.string,
+};
+
+IntakeForm.defaultProps = {
+  selectedPatientId: null,
 };
 
 export default IntakeForm;
