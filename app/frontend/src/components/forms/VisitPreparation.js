@@ -6,6 +6,39 @@ import TextArea from "../formElements/TextArea";
 import SubmitButton from "../formElements/Button";
 import RadioButtonGroup from "../formElements/RadioButtonGroup";
 
+const BinaryRadioButtonGroup = ({
+  inactiveInputs,
+  setInactiveInputs,
+  fieldName,
+}) => (
+  <RadioButtonGroup
+    value={!!inactiveInputs[fieldName]}
+    onChange={(v) => {
+      setInactiveInputs({
+        ...inactiveInputs,
+        [fieldName]: v,
+      });
+    }}
+    fieldName={fieldName}
+    options={[
+      {
+        label: "Yes",
+        value: true,
+      },
+      {
+        label: "No",
+        value: false,
+      },
+    ]}
+  />
+);
+
+BinaryRadioButtonGroup.propTypes = {
+  inactiveInputs: PropTypes.objectOf(PropTypes.bool).isRequired,
+  setInactiveInputs: PropTypes.func.isRequired,
+  fieldName: PropTypes.string.isRequired,
+};
+
 const PatientInfo = ({ patientData, handleSubmit }) => {
   const [patientAnswers, setAnswers] = React.useState({ ...patientData });
   const [inactiveInputs, setInactiveInputs] = React.useState({});
@@ -16,29 +49,6 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
 
   const setFieldValue = (key, value) =>
     setAnswers({ ...patientAnswers, [key]: value });
-
-  const BinaryRadioButtonGroup = ({ fieldName }) => (
-    <RadioButtonGroup
-      value={!!inactiveInputs[fieldName]}
-      setFieldValue={(field, value) => {
-        setInactiveInputs({
-          ...inactiveInputs,
-          [fieldName]: value,
-        });
-      }}
-      fieldName={fieldName}
-      options={[
-        {
-          label: "Yes",
-          value: true,
-        },
-        {
-          label: "No",
-          value: false,
-        },
-      ]}
-    />
-  );
 
   return (
     <FormContainer
@@ -66,7 +76,11 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
                       Do you have any specific requests for new medications,
                       refills, or tests?
                     </span>
-                    <BinaryRadioButtonGroup fieldName="hasRequests" />
+                    <BinaryRadioButtonGroup
+                      fieldName="hasRequests"
+                      setInactiveInputs={setInactiveInputs}
+                      inactiveInputs={inactiveInputs}
+                    />
                   </div>
                 }
                 fieldName="patientRequests"
@@ -101,7 +115,11 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
                       Is there anything else you want to remember for your
                       appointment?
                     </span>
-                    <BinaryRadioButtonGroup fieldName="hasAdditionalComments" />
+                    <BinaryRadioButtonGroup
+                      fieldName="hasAdditionalComments"
+                      setInactiveInputs={setInactiveInputs}
+                      inactiveInputs={inactiveInputs}
+                    />
                   </div>
                 }
                 disabled={!inactiveInputs.hasAdditionalComments}

@@ -1,25 +1,21 @@
 import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import _ from "lodash";
-import DatePicker from "react-datepicker";
+import PhoneInput from "react-phone-input-2";
 
 import FormLabel from "./FormLabel";
 
 import "./TextInput.css";
-import PhoneInput from "react-phone-input-2";
 
 const DateField = ({
   title,
   value,
   isRequired,
-  placeholder,
   grow,
   onChange,
   valueDiffers,
   small,
   error,
-  ...inputProps
 }) => {
   return (
     <div
@@ -40,11 +36,6 @@ const DateField = ({
         value={value}
         onChange={(phone) => onChange(phone)}
         disableCountryCode
-        inputProps={
-          {
-            // className: "input-field",
-          }
-        }
       />
     </div>
   );
@@ -58,13 +49,11 @@ DateField.propTypes = {
   isRequired: PropTypes.bool,
   valueDiffers: PropTypes.bool,
   small: PropTypes.bool,
-  placeholder: PropTypes.string,
 };
 
 DateField.defaultProps = {
   isRequired: false,
   grow: false,
-  placeholder: null,
   value: null,
   valueDiffers: false,
   small: false,

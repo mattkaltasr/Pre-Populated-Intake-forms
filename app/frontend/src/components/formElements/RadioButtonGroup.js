@@ -15,7 +15,7 @@ const RadioButton = ({ label, checked, onChange }) => (
     }}
     onClick={onChange}
   >
-    <input type="radio" checked={!!checked} onChange={onChange} />
+    <input type="radio" checked={checked} onChange={onChange} />
     <span style={{ margin: "auto auto auto 0.25em" }}>{label}</span>
   </div>
 );
@@ -26,14 +26,7 @@ RadioButton.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-const RadioButtonGroup = ({
-  title,
-  options,
-  value,
-  isRequired,
-  setFieldValue,
-  fieldName,
-}) => (
+const RadioButtonGroup = ({ title, options, value, isRequired, onChange }) => (
   <div
     className={classNames("flex flex-col input-field-outer")}
     style={{ padding: "0.5em", margin: "auto 0 auto 0" }}
@@ -48,9 +41,12 @@ const RadioButtonGroup = ({
             key={label}
             label={label}
             checked={
-              value === optionValue || (aliasValues && aliasValues.has(value))
+              !!(
+                value === optionValue ||
+                (aliasValues && aliasValues.has(value))
+              ) /** cast to boolean */
             }
-            onChange={() => setFieldValue(fieldName, optionValue)}
+            onChange={() => onChange(optionValue)}
           />
         );
       })}
@@ -66,8 +62,7 @@ RadioButtonGroup.propTypes = {
     })
   ).isRequired,
   value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
-  setFieldValue: PropTypes.func.isRequired,
-  fieldName: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   isRequired: PropTypes.bool,
 };

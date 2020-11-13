@@ -28,10 +28,9 @@ const PatientInfo = ({ patientData }) => {
               <TextInput
                 placeholder="name"
                 title="First"
-                fieldName="firstName"
                 isRequired
                 grow
-                setFieldValue={setFieldValue}
+                onChange={(v) => setFieldValue("firstName", v)}
                 value={patientAnswers.firstName}
                 valueDiffers={
                   patientAnswers.firstName !== patientData.firstName
@@ -43,16 +42,15 @@ const PatientInfo = ({ patientData }) => {
                 isRequired
                 small
                 grow
-                setFieldValue={setFieldValue}
+                onChange={(v) => setFieldValue("middleInitial", v)}
                 value={patientAnswers.middleInitial}
               />
               <TextInput
                 placeholder="name"
                 title="Last"
-                fieldName="lastName"
                 isRequired
                 grow
-                setFieldValue={setFieldValue}
+                onChange={(v) => setFieldValue("lastName", v)}
                 value={patientAnswers.lastName}
                 valueDiffers={patientAnswers.lastName !== patientData.lastName}
               />
@@ -89,8 +87,6 @@ const PatientInfo = ({ patientData }) => {
                 small
               />
             </div>
-          </div>
-          <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
             <div className="flex">
               <DateField
                 title="Date of Birth"
@@ -99,10 +95,9 @@ const PatientInfo = ({ patientData }) => {
               />
               <RadioButtonGroup
                 title="Gender"
-                setFieldValue={setFieldValue}
-                fieldName="gender"
+                onChange={(v) => setFieldValue("gender", v)}
                 isRequired
-                value={patientAnswers.gender}
+                value={patientAnswers.gender || ""}
                 valueDiffers={patientAnswers.gender !== patientData.gender}
                 options={[
                   { label: "Male", value: "male" },
@@ -110,16 +105,21 @@ const PatientInfo = ({ patientData }) => {
                 ]}
               />
             </div>
+          </div>
+          <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
             <div className="flex" style={{ flexWrap: "wrap" }}>
               <RadioButtonGroup
                 title="Relationship Status"
-                setFieldValue={setFieldValue}
-                fieldName="relationshipStatus"
+                onChange={(v) => setFieldValue("relationshipStatus", v)}
                 options={[
                   {
                     label: "Single",
                     value: "single",
-                    /** hook to provide "fuzzy" text matching */
+                    /** hook to provide "fuzzy" text matching.
+                     * this is slightly hacky, and I couldn't find
+                     * an enum of all legal FHIR values for relationshipStatus.
+                     * All choices here will probably need aliasValues
+                     */
                     aliasValues: new Set(["Never Married"]),
                   },
                   {
@@ -139,7 +139,7 @@ const PatientInfo = ({ patientData }) => {
                     value: "other",
                   },
                 ]}
-                value={patientAnswers.relationshipStatus}
+                value={patientAnswers.relationshipStatus || ""}
               />
               <PhoneInput
                 placeholder="initial"
@@ -158,15 +158,13 @@ const PatientInfo = ({ patientData }) => {
               />
               <TextInput
                 title="Email"
-                fieldName="email"
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("email", value)}
                 value={patientAnswers.email}
                 grow
               />
               <TextInput
                 title="Preferred Contact"
-                fieldName="preferredContact"
-                setFieldValue={setFieldValue}
+                onChange={(value) => setFieldValue("preferredContact", value)}
                 value={patientAnswers.preferredContact}
                 grow
               />
@@ -179,7 +177,6 @@ const PatientInfo = ({ patientData }) => {
 };
 
 PatientInfo.propTypes = {
-  // eslint-disable-next-line no-undef
   // eslint-disable-next-line react/forbid-prop-types
   patientData: PropTypes.object.isRequired,
 };

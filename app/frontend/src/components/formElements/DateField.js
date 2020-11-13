@@ -1,7 +1,6 @@
 import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import _ from "lodash";
 import DatePicker from "react-datepicker";
 
 import FormLabel from "./FormLabel";
@@ -12,13 +11,10 @@ const DateField = ({
   title,
   value,
   isRequired,
-  placeholder,
   grow,
   onChange,
   valueDiffers,
   small,
-  error,
-  ...inputProps
 }) => {
   return (
     <div
@@ -26,7 +22,6 @@ const DateField = ({
         grow: !!grow,
         different: valueDiffers,
         small,
-        error,
       })}
       style={{
         margin: "auto 0 auto 0",
@@ -50,13 +45,11 @@ DateField.propTypes = {
   isRequired: PropTypes.bool,
   valueDiffers: PropTypes.bool,
   small: PropTypes.bool,
-  placeholder: PropTypes.string,
 };
 
 DateField.defaultProps = {
   isRequired: false,
   grow: false,
-  placeholder: null,
   value: null,
   valueDiffers: false,
   small: false,

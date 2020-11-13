@@ -105,7 +105,7 @@ const ConsentForm = ({ handleConsentAgree }) => {
         <Checkbox
           title="I have read the consent form."
           checked={didRead}
-          setFieldValue={() => setDidRead(!didRead)}
+          onChange={() => setDidRead(!didRead)}
         />
         <div className="flex">
           <Button

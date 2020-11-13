@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { loadPatientById } from "../../util/apiHelpers";
 import VisitPreparation from "../forms/VisitPreparation";
 import PatientInfo from "../forms/PatientInfo";
+import MedicalHistory from "../forms/MedicalHistory";
 
 const IntakeForm = ({ patientId }) => {
   const [patientData, setPatientData] = React.useState({});
@@ -32,6 +33,8 @@ const IntakeForm = ({ patientId }) => {
 
   return (
     <>
+      <PatientInfo patientData={patientData} />
+      <MedicalHistory patientData={patientData} />
       <VisitPreparation
         patientData={patientData}
         handleSubmit={(answers) => {
@@ -44,7 +47,6 @@ const IntakeForm = ({ patientId }) => {
           });
         }}
       />
-      <PatientInfo patientData={patientData} />
     </>
   );
 };
