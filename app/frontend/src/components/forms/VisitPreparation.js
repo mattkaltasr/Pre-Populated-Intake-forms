@@ -39,13 +39,9 @@ BinaryRadioButtonGroup.propTypes = {
   fieldName: PropTypes.string.isRequired,
 };
 
-const PatientInfo = ({ patientData, handleSubmit }) => {
-  const [patientAnswers, setAnswers] = React.useState({ ...patientData });
+const PatientInfo = ({ handleSubmit }) => {
+  const [patientAnswers, setAnswers] = React.useState({});
   const [inactiveInputs, setInactiveInputs] = React.useState({});
-
-  React.useEffect(() => {
-    setAnswers({ ...patientData });
-  }, [patientData]);
 
   const setFieldValue = (key, value) =>
     setAnswers({ ...patientAnswers, [key]: value });
@@ -141,8 +137,7 @@ const PatientInfo = ({ patientData, handleSubmit }) => {
 };
 
 PatientInfo.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  patientData: PropTypes.object.isRequired,
+  selectedPatientId: PropTypes.string.isRequired,
   handleSubmit: PropTypes.func.isRequired,
 };
 

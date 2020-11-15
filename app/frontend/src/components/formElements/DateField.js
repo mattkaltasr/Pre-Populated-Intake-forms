@@ -40,7 +40,7 @@ const DateField = ({
 DateField.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  value: PropTypes.instanceOf(Date),
   grow: PropTypes.bool,
   isRequired: PropTypes.bool,
   valueDiffers: PropTypes.bool,
@@ -48,9 +48,9 @@ DateField.propTypes = {
 };
 
 DateField.defaultProps = {
+  value: new Date(),
   isRequired: false,
   grow: false,
-  value: null,
   valueDiffers: false,
   small: false,
 };

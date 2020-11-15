@@ -6,18 +6,35 @@ import TextInput from "../formElements/TextInput";
 import RadioButtonGroup from "../formElements/RadioButtonGroup";
 import DateField from "../formElements/DateField";
 import PhoneInput from "../formElements/PhoneInput";
+import { loadPatientInfoById } from "../../util/apiHelpers";
 
-const PatientInfo = ({ patientData }) => {
-  const [patientAnswers, setAnswers] = React.useState({ ...patientData });
+const PatientInfo = ({ selectedPatientId }) => {
+  const [patientAnswers, setAnswers] = React.useState({}); // hold patient/user responses
+  const [patientData, setPatientData] = React.useState({}); // "immutable" copy of fhir data
+
+  const [error, setError] = React.useState(null);
+  const [isLoading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    setAnswers({ ...patientData });
-  }, [patientData]);
+    if (selectedPatientId) {
+      loadPatientInfoById({
+        patientId: selectedPatientId,
+        setData: (data) => {
+          const [result] = data || [];
+          if (result) {
+            setAnswers({ ...result }); // shallow copy
+            setPatientData({ ...result }); // shallow copy
+          }
+        },
+        setError,
+        setLoading,
+      });
+    }
+  }, [selectedPatientId]);
 
   const setFieldValue = (key, value) =>
     setAnswers({ ...patientAnswers, [key]: value });
 
-  console.log(patientAnswers);
   return (
     <FormContainer
       title="Patient Info"
@@ -182,8 +199,7 @@ const PatientInfo = ({ patientData }) => {
 };
 
 PatientInfo.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  patientData: PropTypes.object.isRequired,
+  selectedPatientId: PropTypes.string.isRequired,
 };
 
 export default PatientInfo;

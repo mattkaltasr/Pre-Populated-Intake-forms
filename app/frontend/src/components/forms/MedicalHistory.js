@@ -4,6 +4,8 @@ import _ from "lodash";
 
 import FormContainer from "../containers/FormContainer";
 import Checkbox from "../formElements/Checkbox";
+import { loadPatientInfoById } from "../../util/apiHelpers";
+import Medications from "./Medications";
 
 const conditions = [
   "Anxiety",
@@ -36,21 +38,51 @@ const checkboxStyle = {
   minWidth: "120px",
 };
 
-const MedicalHistory = ({ patientData }) => {
-  const [patientAnswers, setAnswers] = React.useState({ ...patientData });
+const MedicalHistory = ({ selectedPatientId }) => {
   const [otherCondition, setOther] = React.useState("");
 
+  const [patientAnswers, setAnswers] = React.useState({}); // hold patient/user responses
+  const [patientData, setPatientData] = React.useState({}); // "immutable" copy of fhir data
+
+  const [error, setError] = React.useState(null);
+  const [isLoading, setLoading] = React.useState(false);
+
   React.useEffect(() => {
-    setAnswers({ ...patientData });
-  }, [patientData]);
+    if (selectedPatientId) {
+      loadPatientInfoById({
+        patientId: selectedPatientId,
+        endpoint: "medications",
+        setData: (data) => {
+          const result = data || [];
+
+          if (result) {
+            setAnswers({ ...patientAnswers, medications: result });
+            setPatientData({ ...patientData, medications: result });
+          }
+        },
+        setError,
+        setLoading,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPatientId]);
 
   const setFieldValue = (key, value) =>
+    setAnswers({ ...patientAnswers, [key]: value });
+
+  /** edit a specific medication's field in array */
+  const setMedicationValue = (medicationIndex, key, value) =>
     setAnswers({
       ...patientAnswers,
-      medicalHistory: {
-        ...(patientAnswers.medicalHistory || {}),
-        [key]: value,
-      },
+      medications: _.get(patientAnswers, "medications", [])
+        .slice(0, medicationIndex)
+        .concat({
+          ..._.get(patientAnswers, `medications[${medicationIndex}]`, {}),
+          [key]: value,
+        })
+        .concat(
+          _.get(patientAnswers, "medications", []).slice(medicationIndex + 1)
+        ),
     });
 
   return (
@@ -73,7 +105,7 @@ const MedicalHistory = ({ patientData }) => {
               {conditions.map((r) => {
                 const toCamelCase = _.camelCase(r);
                 const value = _.get(
-                  patientAnswers.medicalHistory,
+                  patientAnswers,
                   toCamelCase,
                   false // default to not selected
                 );
@@ -103,6 +135,10 @@ const MedicalHistory = ({ patientData }) => {
               </div>
             </div>
           </div>
+          <Medications
+            setMedicationValue={setMedicationValue}
+            patientMedications={_.get(patientAnswers, "medications", [])}
+          />
         </div>
       }
     />
@@ -110,8 +146,7 @@ const MedicalHistory = ({ patientData }) => {
 };
 
 MedicalHistory.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  patientData: PropTypes.object.isRequired,
+  selectedPatientId: PropTypes.string.isRequired,
 };
 
 export default MedicalHistory;

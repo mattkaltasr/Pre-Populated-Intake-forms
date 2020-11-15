@@ -11,6 +11,7 @@ import "react-phone-input-2/lib/style.css";
 import "./App.css";
 
 // fritz doyle example patientId "fb7a640d-1f8e-4320-9e07-20f27f8e18f2";
+// example patient id with medication "40f680c8-238b-426b-b1c0-1649c780ce69"
 
 class App extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class App extends React.Component {
 
     this.state = {
       selectedPatientId: null,
-      didConsent: false,
+      didConsent: true,
       patientIdText: "",
     };
 
@@ -26,8 +27,16 @@ class App extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentDidMount() {
+    const { patientIdText } = this.state;
+    if (patientIdText) {
+      this.setState({ selectedPatientId: patientIdText });
+    }
+  }
+
   handleSubmit(e) {
     const { patientIdText } = this.state;
+
     e.preventDefault();
 
     this.setState({ selectedPatientId: patientIdText });
@@ -46,7 +55,6 @@ class App extends React.Component {
           <>
             <FormContainer
               title="Select a Patient"
-              key="form-group-0"
               formComponents={
                 <div className="flex" style={{ flex: 1, flexWrap: "wrap" }}>
                   <div className="flex flex-col" style={{ flex: 1 }}>
