@@ -1,9 +1,10 @@
 import React from "react";
+import PropTypes from "prop-types";
 import classnames from "classnames";
 
 import "./FormContainer.css";
 
-const FormContainer = ({ title, renderFormComponents }) => {
+const FormContainer = ({ title, formComponents }) => {
   const isError = false;
 
   return (
@@ -14,9 +15,14 @@ const FormContainer = ({ title, renderFormComponents }) => {
       })}
     >
       <span className="container-title">{title}</span>
-      <div className="flex">{renderFormComponents()}</div>
+      <div className="flex">{formComponents}</div>
     </div>
   );
+};
+
+FormContainer.propTypes = {
+  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+  formComponents: PropTypes.node.isRequired,
 };
 
 export default FormContainer;
