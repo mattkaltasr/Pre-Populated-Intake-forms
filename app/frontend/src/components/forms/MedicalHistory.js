@@ -9,6 +9,7 @@ import Medications from "./MedicalHistory/Medications";
 import SurgicalHistory from "./MedicalHistory/SurgicalHistory";
 import MedicationAllergies from "./MedicalHistory/MedicationAllergies";
 import HealthHabits from "./MedicalHistory/HealthHabits";
+import FamilyMedicalHistory from "./MedicalHistory/FamilyMedicalHistory";
 
 const conditions = [
   { label: "Anxiety", code: "48694002" },
@@ -149,6 +150,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
             <SurgicalHistory />
           </div>
           <HealthHabits />
+          <FamilyMedicalHistory />
         </div>
       }
     />

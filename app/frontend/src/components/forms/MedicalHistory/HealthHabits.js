@@ -1,8 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import _ from "lodash";
 
-import FormLabel from "../../formElements/FormLabel";
 import Checkbox from "../../formElements/Checkbox";
 
 const checkboxStyle = {
@@ -26,7 +24,10 @@ const HealthHabits = ({ setMedicationValue, patientMedications }) => {
   const [selectedSmokingOption, setSelected] = React.useState(null);
 
   return (
-    <div className="flex flex-col" style={{ flex: 1, minWidth: "300px" }}>
+    <div
+      className="flex flex-col"
+      style={{ flex: 1, minWidth: "300px", marginBottom: "1em" }}
+    >
       <strong style={{ flex: 1, fontSize: "0.85em", marginBottom: "0.5em" }}>
         Health Habits
       </strong>
