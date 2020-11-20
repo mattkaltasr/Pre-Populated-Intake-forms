@@ -1,0 +1,84 @@
+import React from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
+
+import "../Medications.css";
+
+const TableCell = ({ value, onChange }) => (
+  <div style={{ flex: 1, display: "flex", margin: "0.25em" }}>
+    <input
+      style={{ width: "1em", flex: 1 }}
+      value={value}
+      onChange={({ target: { value: next } }) => onChange(next)}
+      className="input-field small"
+    />
+  </div>
+);
+
+/** adjust as needed */
+const MED_COUNT = 4;
+
+/** enforce min array length of 4, max of incoming */
+const normalizeMedicationsArray = ({ patientMedications }) => {
+  if (patientMedications.length >= MED_COUNT) {
+    return patientMedications;
+  }
+  return patientMedications.concat(
+    _.range(MED_COUNT - patientMedications.length).map(() => ({}))
+  );
+};
+
+const SimpleInputTable = ({ setMedicationValue, rows, headers }) => {
+  return (
+    <div className="flex flex-col" style={{ marginTop: "1em" }}>
+      <div className="flex" style={{ marginBottom: "0.25em" }}>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Medication
+        </strong>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Condition
+        </strong>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Dosage
+        </strong>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Frequency
+        </strong>
+      </div>
+      <div className="flex flex-col">
+        {rows.map((row) => {
+          const { condition, dosage, frequency, medication } = med;
+          const key = idx;
+
+          return (
+            <div className="flex medical-row" key={key}>
+              <TableCell
+                onChange={(val) => setMedicationValue(idx, "medication", val)}
+                value={medication}
+              />
+              <TableCell
+                onChange={(val) => setMedicationValue(idx, "condition", val)}
+                value={condition}
+              />
+              <TableCell
+                onChange={(val) => setMedicationValue(idx, "dosage", val)}
+                value={dosage}
+              />
+              <TableCell
+                onChange={(val) => setMedicationValue(idx, "frequency", val)}
+                value={frequency}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+SimpleInputTable.propTypes = {
+  setMedicationValue: PropTypes.func.isRequired,
+  patientMedications: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
+
+export default SimpleInputTable;
