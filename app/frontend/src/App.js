@@ -1,47 +1,93 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
 
-function App() {
-  const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [words, setWords] = useState([]);
+import IntakeForm from "./components/pages/IntakeForm";
+import ConsentForm from "./components/pages/ConsentForm";
+import FormContainer from "./components/containers/FormContainer";
+import FormLabel from "./components/formElements/FormLabel";
 
-  // Note: the empty deps array [] means
-  // this useEffect will run once
-  // similar to componentDidMount()
-  useEffect(() => {
-    fetch("/pre-populated-intake-forms-app-backend/api/hello")
-        .then(res => res.json())
-        .then(
-            (result) => {
-              setIsLoaded(true);
-              setWords(result.words);
-            },
-            // Note: it's important to handle errors here
-            // instead of a catch() block so that we don't swallow
-            // exceptions from actual bugs in components.
-            (error) => {
-              setIsLoaded(true);
-              setError(error);
-            }
-        )
-  }, [])
+/** css is globally scoped */
+import "react-datepicker/dist/react-datepicker.css";
+import "react-phone-input-2/lib/style.css";
+import "./App.css";
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
+// fritz doyle example patientId "fb7a640d-1f8e-4320-9e07-20f27f8e18f2";
+// example patient id with medication "40f680c8-238b-426b-b1c0-1649c780ce69"
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedPatientId: null,
+      didConsent: true,
+      patientIdText: "",
+    };
+
+    this.inputRef = React.createRef();
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    const { patientIdText } = this.state;
+    if (patientIdText) {
+      this.setState({ selectedPatientId: patientIdText });
+    }
+  }
+
+  handleSubmit(e) {
+    const { patientIdText } = this.state;
+
+    e.preventDefault();
+
+    this.setState({ selectedPatientId: patientIdText });
+  }
+
+  render() {
+    const { selectedPatientId, didConsent, patientIdText } = this.state;
+
     return (
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <p>
-              {words.map(word => word)}
-            </p>
-          </header>
-        </div>
+      <div className="app-container">
+        {!didConsent ? (
+          <ConsentForm
+            handleConsentAgree={(val) => this.setState({ didConsent: val })}
+          />
+        ) : (
+          <>
+            <FormContainer
+              title="Select a Patient"
+              formComponents={
+                <div className="flex" style={{ flex: 1, flexWrap: "wrap" }}>
+                  <div className="flex flex-col" style={{ flex: 1 }}>
+                    <div className="flex" style={{ flexWrap: "wrap" }}>
+                      <FormLabel title="Patient ID" />
+                      <form onSubmit={this.handleSubmit}>
+                        <input
+                          style={{ width: "100%", margin: "0px 5px" }}
+                          className="input-field"
+                          ref={this.inputRef}
+                          value={patientIdText}
+                          onChange={(e) =>
+                            this.setState({ patientIdText: e.target.value })
+                          }
+                        />
+                        <button
+                          type="submit"
+                          className="submit-button"
+                          style={{ margin: "5px 5px" }}
+                          disabled={!patientIdText}
+                        >
+                          Submit
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              }
+            />
+            <IntakeForm selectedPatientId={selectedPatientId} />
+          </>
+        )}
+      </div>
     );
   }
 }

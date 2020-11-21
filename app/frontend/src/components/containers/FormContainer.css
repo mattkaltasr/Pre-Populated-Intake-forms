@@ -1,0 +1,34 @@
+.form-container {
+  position: relative;
+  border: 1px solid rgba(0,0,0,0.25);
+  padding: 1em;
+  border-radius: 0.28em;
+  margin: 0 auto 2em auto;
+  max-width: 1000px;
+}
+
+.form-container:last-child {
+  margin-bottom: 0;
+}
+
+.form-container:hover {
+  border: 1px solid rgba(0,0,0,0.33);
+}
+
+.form-container.complete {
+  border: 1px solid green;
+}
+
+.form-container.error {
+  border: 1px solid red;
+}
+
+.container-title {
+  position: absolute;
+  top: -0.75em;
+  left: 1.5em;
+  padding: 0 0.5em 0 0.5em;
+  background: white;
+  font-size: 1em;
+  font-weight: 400;
+}

@@ -1,11 +1,13 @@
 import logging
 from datetime import date
-from flask import Flask
+from flask import Flask, request
 from flask import jsonify
 from fhirclient import client
 from fhirclient.models.patient import Patient
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.contactpoint import ContactPoint
+from fhirclient.models.codeableconcept import CodeableConcept
+from fhirclient.models.address import Address
 from fhirclient.models.fhirdate import FHIRDate
 from fhirclient.models.medicationrequest import MedicationRequest
 from fhirclient.models.medication import Medication
@@ -13,6 +15,7 @@ from fhirclient.models.condition import Condition
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from requests.exceptions import HTTPError
+from datetime import datetime
 
 # This is only used later in the query to the FHIR server as an example to the team
 PEDIATRICS_AGE_LIMIT = (date.today() - (date(2000, 12, 31) - date(1980, 1, 1))).isoformat()
@@ -78,6 +81,7 @@ def get_patients():
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({'error': 'something really bad has happened!'})
 
+
 # Get Patient's Personal Info by Id
 @app.route('/api/patient/<id>', methods=['GET'])
 def getPatient(id):
@@ -117,8 +121,6 @@ def getPatient(id):
             if patient.gender:
                 gender = patient.gender
 
-            #TODO Age
-
             #address
             if len(patient.address) > 0:
                 for add in patient.address:
@@ -137,6 +139,10 @@ def getPatient(id):
             #dob
             if patient.birthDate:
                 dob = patient.birthDate.date
+                age = int((datetime.today() - datetime.strptime(patient.birthDate.isostring, '%Y-%m-%d')).days / 365.2425)
+
+                print("age-")
+                print(age)
 
             #relationship status
             if patient.maritalStatus:
@@ -161,6 +167,7 @@ def getPatient(id):
                 "lastName": last_name,
                 "gender": gender,
                 "birthDate": dob,
+                "age":age,
                 "address": address,
                 "city": city,
                 "state": state,
@@ -168,6 +175,7 @@ def getPatient(id):
                 "country": country,
                 "homePhone": phone_home,
                 "mobilePhone": phone_mobile,
+                "email": email,
                 "relationshipStatus": relationship_status
             })
         return jsonify(results)
@@ -180,7 +188,38 @@ def getPatient(id):
         return jsonify({'error': 'something really bad has happened!'})
 
 #TODO Get Medical history by patient id
+@app.route('/api/conditions/<id>', methods=['GET'])
+def getMedicalHistoryForPatient(id):
+    smart = _get_smart()
+    """ Get conditions list by patient id
+    """
+    #1e19bb7a-d990-4924-9fae-be84f19c53c1
+    try:
+        results = []
+        p_search = Condition.where(struct={'subject': "Patient/"+str(id)})
+        p_conditions = p_search.perform_resources(smart.server)
+        print(id)
+        print(len(p_conditions))
+        for cond in p_conditions:
+            code=""
+            display =""
+            if cond.code:
+                code = cond.code.coding[0].code
+                display = cond.code.coding[0].display
+            results.append({
+                           "code": code,
+                           "display": display
+                       })
+        results.sort(key=lambda m: m.get("display"))
+        return jsonify(results)
 
+    except FHIRValidationError:
+            # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+            return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
+                                        not valid there'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 #TODO Get Medications by patient id
 @app.route('/api/medications/<id>', methods=['GET'])
 def getMedications(id):
@@ -238,29 +277,16 @@ def getMedications(id):
 #TODO Get Health habits (alcohol use, smoking, drug use)
 #TODO Get Family Medical History
 
-#TODO POST - Create a Test Patient with all possible details
+#TODO POST - Patient Info Update
 #WIP
-@app.route('/api/create-patient', methods=['POST'])
-def createPatient():
+@app.route('/api/patient/save', methods=['PUT'])
+def updatePatient():
     smart = _get_smart()
     try:
-        # Create Patient
-        new_patient = Patient()
+        #prep patient info
+        patient = preparePatientInfo(request.get_json())
 
-        # Name
-        human_name = HumanName()
-        human_name.family = 'doe'
-        human_name.use = 'official'
-        human_name.given = ['john']
-        new_patient.name = [human_name]
-
-        # contactpoint
-        contact_point = ContactPoint()
-        contact_point.system = "phone"
-        contact_point.value = '123-456-9999'
-        new_patient.telecom = [contact_point]
-
-        result = new_patient.create(server=smart.server)
+        result = patient.create(server=smart.server)
         print(result)
     except FHIRValidationError:
         # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
@@ -269,6 +295,73 @@ def createPatient():
     except HTTPError:
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({'error': 'something really bad has happened!'})
+
+def preparePatientInfo(patientInfo):
+
+    patient = Patient()
+    patient.id = patientInfo['id']
+
+    # First, last names
+    if 'firstName' in patientInfo or 'lastname' in patientInfo:
+        updatedName = HumanName()
+        if 'firstname' in patientInfo and patientInfo['firstname']:
+            updatedName.given = [patientInfo['firstname']]
+        if 'lastname' in patientInfo and patientInfo['lastname']:
+            updatedName.family = patientInfo['lastname']
+        patient.name = [updatedName]
+
+    #Gender
+    if 'gender' in patientInfo:
+        patient.gender = patientInfo['gender']
+
+    # Birth Date
+    #if 'birthDate' in patientInfo:
+     #   birthdate = FHIRDate(patientInfo['dob'])
+      #  patient.birthDate = birthdate
+
+    # address details update
+    if 'address' in patientInfo:
+        address = Address()
+        if 'address' in patientInfo:
+            address.line = [patientInfo['address']]
+        if 'city' in patientInfo:
+            address.city = patientInfo['city']
+        if 'state' in patientInfo:
+            address.state = patientInfo['state']
+        if 'country' in patientInfo:
+            address.country = patientInfo['country']
+        if 'postalCode' in patientInfo:
+            address.postalCode = patientInfo['postalCode']
+        patient.address = [address]
+
+    # Email/Phone
+    if 'email' in patientInfo or 'homePhone' in patientInfo or 'mobilePhone' in patientInfo:
+        patient.telecom = []
+        if 'email' in patientInfo:
+            email = ContactPoint()
+            email.system = 'email'
+            email.value = patientInfo['email']
+            patient.telecom.append(email)
+        if 'homePhone' in patientInfo:
+            phone = ContactPoint()
+            phone.system = 'phone'
+            phone.use = 'home'
+            phone.value = patientInfo['homePhone']
+            patient.telecom.append(phone)
+        if 'mobilePhone' in patientInfo:
+            phone = ContactPoint()
+            phone.system = 'phone'
+            phone.use = 'mobile'
+            phone.value = patientInfo['mobilePhone']
+            patient.telecom.append(phone)
+
+        if 'relationshipStatus' in patientInfo:
+            maritalStatus = CodeableConcept()
+           # maritalStatus.coding = ''
+            maritalStatus.text = patientInfo['relationshipStatus']
+            patient.maritalStatus = maritalStatus
+
+    return patient
 
 # start the app
 if '__main__' == __name__:

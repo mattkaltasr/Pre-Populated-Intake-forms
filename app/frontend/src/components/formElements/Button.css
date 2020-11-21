@@ -1,0 +1,28 @@
+.submit-button {
+  color: red;
+  padding: .78571429em 1.5em .78571429em;
+  border: none;
+  border-radius: 0.28em;
+  background-color: #2185d0;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1em;
+  text-shadow: none;
+  box-shadow: 0 0 0 0 rgba(34,36,38,.15) inset;
+  cursor: pointer;
+  outline: none;
+}
+
+.submit-button:hover {
+  background-color: #1678c2
+}
+
+.submit-button:active {
+  background-color: #1a69a4;
+}
+
+.submit-button.disabled {
+  cursor: not-allowed;
+  background-color: #1a69a4;
+  color: lightgray;
+}
