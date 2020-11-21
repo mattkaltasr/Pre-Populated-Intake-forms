@@ -277,6 +277,37 @@ def getMedications(id):
 #TODO Get Health habits (alcohol use, smoking, drug use)
 #TODO Get Family Medical History
 #TODO get surgical history
+def getSurgicalHistoryForPatient(id):
+    smart = _get_smart()
+    """ Get procedure list by patient id
+    """
+    #1e19bb7a-d990-4924-9fae-be84f19c53c1
+    try:
+        results = []
+        p_search = Procedure.where(struct={'subject': "Patient/"+str(id)})
+        p_procedure = p_search.perform_resources(smart.server)
+        print(id)
+        print(len(p_procedure))
+        for proc in p_procedure:
+            code=""
+            display =""
+            if proc.code:
+                code = proc.code.coding[0].code
+                display = proc.code.coding[0].display
+            results.append({
+                           "code": code,
+                           "display": display
+                       })
+        results.sort(key=lambda m: m.get("display"))
+        return jsonify(results)
+
+    except FHIRValidationError:
+            # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+            return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
+                                        not valid there'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 #TODO post surgical history
 
 
