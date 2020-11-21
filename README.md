@@ -79,6 +79,8 @@ Start your favorite web browser and navigate to:
     `<BASE_URL>/api/patient/<id>`
     * Get Medications by Patient Id
     `<BASE_URL>/api/medications/<id>`
+    * Get Conditions by Patient Id
+    `<BASE_URL>/api/conditions/<id>`
 
 ## Authors
 
