@@ -277,6 +277,7 @@ def getMedications(id):
 #TODO Get Health habits (alcohol use, smoking, drug use)
 #TODO Get Family Medical History
 #TODO get surgical history
+@app.route('/api/Procedure/<id>', methods=['GET'])
 def getSurgicalHistoryForPatient(id):
     smart = _get_smart()
     """ Get procedure list by patient id
