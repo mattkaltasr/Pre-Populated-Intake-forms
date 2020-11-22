@@ -5,22 +5,26 @@ import _ from "lodash";
 import FormContainer from "../containers/FormContainer";
 import Checkbox from "../formElements/Checkbox";
 import { loadPatientInfoById } from "../../util/apiHelpers";
-import Medications from "./Medications";
+import Medications from "./MedicalHistory/Medications";
+import SurgicalHistory from "./MedicalHistory/SurgicalHistory";
+import MedicationAllergies from "./MedicalHistory/MedicationAllergies";
+import HealthHabits from "./MedicalHistory/HealthHabits";
+import FamilyMedicalHistory from "./MedicalHistory/FamilyMedicalHistory";
 
 const conditions = [
-  "Anxiety",
-  "Asthma",
-  "Arthritis",
-  "Cancer",
-  "Diabetes",
-  "Depression",
-  "Heart Attack",
-  "High Blood Pressure",
-  "HIV/AIDS",
-  "Kidney Stones",
-  "Seizures",
-  "Stroke",
-  "Thyroid Disease",
+  { label: "Anxiety", code: "48694002" },
+  { label: "Asthma", code: "195967001" },
+  { label: "Arthritis", code: "202031002" },
+  { label: "Cancer", code: "395099008" },
+  { label: "Diabetes", code: "48694002" }, // ??
+  { label: "Depression", code: "35489007" }, // depressive disorder
+  { label: "Heart Attack", code: "22298006" },
+  { label: "High Blood Pressure", code: "38341003" },
+  { label: "HIV/AIDS", code: "19030005" },
+  { label: "Kidney Stones", code: "64033007" },
+  { label: "Seizures", code: "230433003" },
+  { label: "Stroke", code: "230690007" },
+  { label: "Thyroid Disease", code: "14304000" },
 ];
 
 /** these should probably be stowed away in a
@@ -90,7 +94,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
       title="Medical History"
       formComponents={
         <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
-          <div className="flex flex-col">
+          <div className="flex flex-col" style={{ marginBottom: "0.5em" }}>
             <span style={{ fontSize: "0.8em", marginBottom: "0.5em" }}>
               (Please check or list any medical problems you have experienced)
             </span>
@@ -103,24 +107,23 @@ const MedicalHistory = ({ selectedPatientId }) => {
               }}
             >
               {conditions.map((r) => {
-                const toCamelCase = _.camelCase(r);
                 const value = _.get(
                   patientAnswers,
-                  toCamelCase,
+                  r.code,
                   false // default to not selected
                 );
 
                 return (
                   <Checkbox
-                    key={r}
-                    title={r}
+                    key={r.code}
+                    title={r.label}
                     checked={!!value}
-                    onChange={() => setFieldValue(toCamelCase, !value)}
+                    onChange={() => setFieldValue(r.code, !value)}
                     style={{ ...checkboxStyle }}
                   />
                 );
               })}
-              <div style={{ ...checkboxStyle }} className="flex">
+              {/* <div style={{ ...checkboxStyle }} className="flex">
                 <span style={{ margin: "auto 0.5em auto 0" }}>Other: </span>
                 <input
                   style={{
@@ -132,13 +135,22 @@ const MedicalHistory = ({ selectedPatientId }) => {
                   value={otherCondition}
                   className="input-field"
                 />
-              </div>
+              </div> */}
             </div>
           </div>
           <Medications
             setMedicationValue={setMedicationValue}
             patientMedications={_.get(patientAnswers, "medications", [])}
           />
+          <div
+            className="flex"
+            style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
+          >
+            <MedicationAllergies />
+            <SurgicalHistory />
+          </div>
+          <HealthHabits />
+          <FamilyMedicalHistory />
         </div>
       }
     />

@@ -1,5 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import _ from "lodash";
+
+import "../Medications.css";
 
 const Cell = ({ value, onChange }) => (
   <div style={{ flex: 1, display: "flex", margin: "0.25em" }}>
@@ -15,22 +18,34 @@ const Cell = ({ value, onChange }) => (
 /** adjust as needed */
 const MED_COUNT = 4;
 
+/** enforce min array length of 4, max of incoming */
+const normalizeMedicationsArray = ({ patientMedications }) => {
+  if (patientMedications.length >= MED_COUNT) {
+    return patientMedications;
+  }
+  return patientMedications.concat(
+    _.range(MED_COUNT - patientMedications.length).map(() => ({}))
+  );
+};
+
 const Medications = ({ setMedicationValue, patientMedications }) => {
-  /** enforce min array length of 4, max of incoming */
-  const effectiveArr =
-    patientMedications.length >= MED_COUNT
-      ? patientMedications
-      : patientMedications.concat(
-          _.range(MED_COUNT - patientMedications.length).map(() => ({}))
-        );
+  const effectiveArr = normalizeMedicationsArray({ patientMedications });
 
   return (
     <div className="flex flex-col" style={{ marginTop: "1em" }}>
       <div className="flex" style={{ marginBottom: "0.25em" }}>
-        <strong style={{ flex: 1, fontSize: "0.85em" }}>Medication</strong>
-        <strong style={{ flex: 1, fontSize: "0.85em" }}>Condition</strong>
-        <strong style={{ flex: 1, fontSize: "0.85em" }}>Dosage</strong>
-        <strong style={{ flex: 1, fontSize: "0.85em" }}>Frequency</strong>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Medication
+        </strong>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Condition
+        </strong>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Dosage
+        </strong>
+        <strong style={{ flex: 1, fontSize: "0.85em", padding: "0.25em" }}>
+          Frequency
+        </strong>
       </div>
       <div className="flex flex-col">
         {effectiveArr.map((med, idx) => {
@@ -38,11 +53,11 @@ const Medications = ({ setMedicationValue, patientMedications }) => {
           const key = idx;
 
           return (
-            <div
-              className="flex"
-              key={key}
-              style={{ borderBottom: "1px solid lightgray", padding: "0.25em" }}
-            >
+            <div className="flex medical-row" key={key}>
+              <Cell
+                onChange={(val) => setMedicationValue(idx, "medication", val)}
+                value={medication}
+              />
               <Cell
                 onChange={(val) => setMedicationValue(idx, "condition", val)}
                 value={condition}
@@ -55,16 +70,17 @@ const Medications = ({ setMedicationValue, patientMedications }) => {
                 onChange={(val) => setMedicationValue(idx, "frequency", val)}
                 value={frequency}
               />
-              <Cell
-                onChange={(val) => setMedicationValue(idx, "medication", val)}
-                value={medication}
-              />
             </div>
           );
         })}
       </div>
     </div>
   );
+};
+
+Medications.propTypes = {
+  setMedicationValue: PropTypes.func.isRequired,
+  patientMedications: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default Medications;
