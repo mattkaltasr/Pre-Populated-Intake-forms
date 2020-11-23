@@ -7,6 +7,7 @@ from fhirclient.models.patient import Patient
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.contactpoint import ContactPoint
 from fhirclient.models.codeableconcept import CodeableConcept
+from fhirclient.models.coding import Coding
 from fhirclient.models.address import Address
 from fhirclient.models.fhirdate import FHIRDate
 from fhirclient.models.medicationrequest import MedicationRequest
@@ -14,6 +15,7 @@ from fhirclient.models.medication import Medication
 from fhirclient.models.condition import Condition
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
+from fhirclient.models.observation import Observation
 from requests.exceptions import HTTPError
 from datetime import datetime
 
@@ -294,7 +296,47 @@ def getMedications(id):
         return jsonify({"error": "something really bad has happened!"})
 
 
-#TODO Get Health habits (alcohol use, smoking, drug use)
+@app.route('/api/healthhabits/<id>', methods=['GET'])
+def getHealthHabitsForPatient(id):
+    smart = _get_smart()
+    """
+    Get health habit Observations by patient id
+    """
+    try:
+        results = []
+        o_search = Observation.where(struct={'subject': "Patient/"+str(id)})
+        o_observation = o_search.perform_resources(smart.server)
+        print(id)
+        print(o_observation)
+        for obs in o_observation:
+            if ((obs.code.coding[0].system == 'http://loinc.org') and (obs.code.coding[0].code == '72166-2')):
+                # Shows nominal codes underneath smoking status https://loinc.org/72166-2/
+                code = obs.valueCodeableConcept.coding[0].code
+                display = obs.valueCodeableConcept.coding[0].display
+                results.append({
+                    "smokingStatus": {"code": code, "display": display}
+                    })
+            elif ((obs.code.coding[0].system == 'http://loinc.org') and (obs.code.coding[0].code == '8663-7')):
+                value = obs.valueQuantity.value
+                results.append({
+                    "smokingRate": {"value": value}
+                    })
+            elif ((obs.code.coding[0].system == 'http://acme-rehab.org') and (obs.code.coding[0].code == 'alcohol-type')):
+                # https://hl7.org/fhir/2018May/observation-example-alcohol-type.html
+                results.append({
+                    "useAlcohol": True
+                    })
+        return jsonify(results)
+
+    except FHIRValidationError:
+            # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+            return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
+                                        not valid there'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
+
+
 #TODO Get Family Medical History
 #TODO get surgical history
 @app.route('/api/Procedure/<id>', methods=['GET'])

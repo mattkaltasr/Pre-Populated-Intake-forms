@@ -13,7 +13,7 @@ import "./App.css";
 // fritz doyle example patientId "fb7a640d-1f8e-4320-9e07-20f27f8e18f2";
 // example patient id with medication "40f680c8-238b-426b-b1c0-1649c780ce69"
 
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 class App extends React.Component {
   constructor(props) {

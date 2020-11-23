@@ -1,6 +1,6 @@
-const DEV_URL = "http://127.0.0.1:8086/api"; // for testing locally
+// const DEV_URL = "http://127.0.0.1:8086/api"; // for testing locally
 
-// const BASE_URL = "/pre-populated-intake-forms-app-backend/api";
+const BASE_URL = "/pre-populated-intake-forms-app-backend/api";
 
 export const loadPatientInfoById = ({
   patientId,
@@ -13,7 +13,7 @@ export const loadPatientInfoById = ({
     setLoading(true);
   }
 
-  fetch(`${DEV_URL}/${endpoint}/${patientId}`)
+  fetch(`${BASE_URL}/${endpoint}/${patientId}`)
     .then((res) => res.json())
     .then(
       (result) => {
@@ -42,7 +42,7 @@ export const loadPatientList = ({
     setLoading(true);
   }
 
-  fetch(`${DEV_URL}/patients`)
+  fetch(`${BASE_URL}/patients`)
     .then((res) => res.json())
     .then(
       (result) => {
