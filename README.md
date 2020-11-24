@@ -81,6 +81,29 @@ Start your favorite web browser and navigate to:
     `<BASE_URL>/api/medications/<id>`
     * Get Conditions by Patient Id
     `<BASE_URL>/api/conditions/<id>`
+    * Save (PUT) Patient Info
+    `<BASE_URL>/a/api/patient/save`
+        
+        Note: Name, Birthdate excluded from patient save
+            
+        Sample body json:
+            
+                {
+                  "address": "Suite 243",
+                  "city": "Adams",
+                  "country": "US",
+                  "email": "test@test.com",
+                  "gender": "male",
+                  "homePhone": "288-062-3563 x70396",
+                  "id": "5d810b5e-29d9-4faa-81bc-e0ca1ca4b394",
+                  "mobilePhone": "123-456-9999",
+                  "postalCode": "01220",
+                  "relationshipStatus": "M",
+                  "state": "MA"
+                }
+  
+    
+    
 
 ## Authors
 
