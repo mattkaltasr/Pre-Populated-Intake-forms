@@ -1,0 +1,18 @@
+.medical-row {
+  border-bottom: 1px solid lightgray;
+  padding: 0.25em;
+  transition: 50ms ease-in;
+}
+
+.medical-row:hover {
+  background-color: rgba(0,0,0,0.03);
+}
+
+.medical-row:first-child {
+    border-radius: 0.28em 0.28em 0 0;
+}
+
+.medical-row:last-child {
+  border-bottom: none;
+  border-radius: 0 0 0.28em 0.28em;
+}
