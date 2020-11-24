@@ -381,10 +381,11 @@ def updatePatient():
     smart = _get_smart()
     try:
         #prep patient info
-        patient = preparePatientInfo(request.get_json())
-
-        result = patient.create(server=smart.server)
+        patient = preparePatientInfo(request.json, smart)
+        print(request.json['id'])
+        result = patient.update(server=smart.server)
         print(result)
+        return jsonify(result)
     except FHIRValidationError:
         # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
         return jsonify(
@@ -398,28 +399,32 @@ def updatePatient():
         return jsonify({"error": "something really bad has happened!"})
 
 
-def preparePatientInfo(patientInfo):
+def preparePatientInfo(patientInfo, smart):
 
-    patient = Patient()
-    patient.id = patientInfo['id']
+    #get existing patient info
+    patient = patient = Patient.read(patientInfo['id'], smart.server)
+    #update the new info and other details preparePatientInfo not changed.
 
+    #TODO check if we want to allow patient to update name and date of both through the screen?
     # First, last names
-    if 'firstName' in patientInfo or 'lastname' in patientInfo:
-        updatedName = HumanName()
-        if 'firstname' in patientInfo and patientInfo['firstname']:
-            updatedName.given = [patientInfo['firstname']]
-        if 'lastname' in patientInfo and patientInfo['lastname']:
-            updatedName.family = patientInfo['lastname']
-        patient.name = [updatedName]
+    #if 'firstName' in patientInfo or 'lastname' in patientInfo:
+    #    updatedName = HumanName()
+    #    updatedName.use = "official"
+    #    if 'firstname' in patientInfo and patientInfo['firstname']:
+    #        updatedName.given = [patientInfo['firstname']]
+    #    if 'lastname' in patientInfo and patientInfo['lastname']:
+    #        updatedName.family = patientInfo['lastname']
+    #    patient.name = [updatedName]
+
+    # Birth Date
+        #if 'birthDate' in patientInfo:
+         #   birthdate = FHIRDate(patientInfo['dob'])
+          #  patient.birthDate = birthdate
+
 
     #Gender
     if 'gender' in patientInfo:
         patient.gender = patientInfo['gender']
-
-    # Birth Date
-    #if 'birthDate' in patientInfo:
-     #   birthdate = FHIRDate(patientInfo['dob'])
-      #  patient.birthDate = birthdate
 
     # address details update
     if 'address' in patientInfo:
