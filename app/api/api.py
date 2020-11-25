@@ -12,6 +12,7 @@ from fhirclient.models.address import Address
 from fhirclient.models.fhirdate import FHIRDate
 from fhirclient.models.medicationrequest import MedicationRequest
 from fhirclient.models.medication import Medication
+from fhirclient.models.procedure import Procedure
 from fhirclient.models.condition import Condition
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
