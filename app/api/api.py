@@ -4,18 +4,15 @@ from datetime import date
 
 from fhirclient.models.coding import Coding
 from fhirclient.models.dosage import Dosage
-from fhirclient.models.element import Element
 from fhirclient.models.fhirreference import FHIRReference
 from fhirclient.models.medicationstatement import MedicationStatement
 from fhirclient.models.quantity import Quantity
-from fhirclient.models.reference import Reference
-from fhirclient.models.timing import Timing, TimingRepeat
+from fhirclient.models.timing import Timing
 from flask import Flask, jsonify, request
 from fhirclient import client
 from fhirclient.models.patient import Patient
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.contactpoint import ContactPoint
-from fhirclient.models.fhirdate import FHIRDate
 from fhirclient.models.medicationrequest import MedicationRequest
 from fhirclient.models.medication import Medication
 from fhirclient.models.condition import Condition
