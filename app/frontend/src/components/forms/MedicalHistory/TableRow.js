@@ -24,6 +24,7 @@ const TableRow = ({ header, rowData, onChange, asCheckbox }) => {
                   borderRadius: 0,
                   outline: "none",
                 }}
+                disabled={!!r.disabled}
                 value={r.value}
                 onChange={({ target: { value } }) => onChange(r.field, value)}
                 className="input-field small"
