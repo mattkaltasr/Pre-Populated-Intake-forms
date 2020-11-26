@@ -46,7 +46,7 @@ smart_defaults = {
 app = Flask(__name__)
 from flask_cors import CORS
 
-CORS(app)
+# CORS(app)
 
 
 # Creates a FHIRClient object and returns it
