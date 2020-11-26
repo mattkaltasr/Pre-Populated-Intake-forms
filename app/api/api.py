@@ -5,8 +5,10 @@ from datetime import date
 from fhirclient.models.coding import Coding
 from fhirclient.models.dosage import Dosage
 from fhirclient.models.element import Element
+from fhirclient.models.fhirreference import FHIRReference
 from fhirclient.models.medicationstatement import MedicationStatement
 from fhirclient.models.quantity import Quantity
+from fhirclient.models.reference import Reference
 from fhirclient.models.timing import Timing, TimingRepeat
 from flask import Flask, jsonify, request
 from fhirclient import client
@@ -380,17 +382,63 @@ def update_home_medication(med_statement_id):
             "coding": [new_condition]
         })]
     if new_dosage:
-        if new_frequency:
-            med_statement.dosage = [Dosage({"timing": {"repeat": new_frequency}, "doseQuantity": new_dosage})]
+        if med_statement.dosage and len(med_statement.dosage) > 0:
+            med_statement.dosage[0].doseQuantity = Quantity(new_dosage)
+        else:
+            med_statement.dosage = [Dosage({"doseQuantity": new_dosage})]
+    if new_frequency:
+        if med_statement.dosage and len(med_statement.dosage) > 0:
+            med_statement.dosage[0].timing = Timing({"repeat": new_frequency})
+        else:
+            med_statement.dosage = [Dosage({"timing": {"repeat": new_frequency}})]
+    try:
+        result = med_statement.update(smart.server)
+        if result:
+            return jsonify({"result": "success", "fhir-response": result})
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'bad request payload'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 
-    print(pretty(med_statement.as_json()))
 
-    result = med_statement.update(smart.server)
+@app.route('/api/home-med/<patient_id>', methods=['POST'])
+def create_home_medication(patient_id):
+    smart = _get_smart()
+    med_statement = MedicationStatement()
+    new_medication = request.json.get("medication")
+    new_condition = request.json.get("condition")
+    new_dosage = request.json.get("dosage")
+    new_frequency = request.json.get("frequency")
+    med_statement.subject = FHIRReference({"reference": f"Patient/{patient_id}"})
+    med_statement.status = "active"
+    med_statement.taken = "y"
+    if new_medication:
+        med_statement.medicationCodeableConcept = CodeableConcept({"coding": [new_medication], "text": new_medication.get("display")})
+    if new_condition:
+        med_statement.reasonCode = [CodeableConcept({
+            "text": new_condition.get("display"),
+            "coding": [new_condition]
+        })]
+    if new_dosage or new_frequency:
+        med_statement.dosage = [Dosage()]
+    if new_dosage:
+        med_statement.dosage[0].doseQuantity = Quantity(new_dosage)
+    if new_frequency:
+        med_statement.dosage[0].timing = Timing({"repeat": new_frequency})
 
-    print(result)
-
-    return jsonify({"success": True})
-
+    try:
+        result = med_statement.create(smart.server)
+        if result:
+            return jsonify({"result": "success", "fhir-response": result})
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'bad request payload'})
+    except HTTPError as e:
+        print(e)
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 
 # start the app
 if '__main__' == __name__:
