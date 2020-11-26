@@ -8,7 +8,10 @@ const SurgicalHistory = ({ patientAnswersSurgical }) => {
   const surgical = patientAnswersSurgical.surgical || [];
   const sliced = surgical.slice(surgical.length - 3, surgical.length);
 
-  console.log("patientAnswersSurgical", patientAnswersSurgical, sliced);
+  const normalized =
+    sliced.length < 3
+      ? [...sliced, ..._.range(0, 3 - sliced.length).map(() => ({}))]
+      : sliced;
 
   return (
     <div
@@ -45,7 +48,7 @@ const SurgicalHistory = ({ patientAnswersSurgical }) => {
             <strong>Year</strong>
           </div>
         </div>
-        {sliced.map((s) => {
+        {normalized.map((s) => {
           return (
             <TableRow
               key={s.code}

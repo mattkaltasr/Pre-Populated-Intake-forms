@@ -235,8 +235,6 @@ def getMedicalHistoryForPatient(id):
         results = []
         p_search = Condition.where(struct={"subject": "Patient/" + str(id)})
         p_conditions = p_search.perform_resources(smart.server)
-        print(id)
-        print(len(p_conditions))
         for cond in p_conditions:
             code = ""
             display = ""
@@ -421,8 +419,8 @@ def updatePatient():
     smart = _get_smart()
     try:
         # prep patient info
+        print(request.json,)  # ["id"])
         patient = preparePatientInfo(request.json, smart)
-        print(request.json["id"])
         result = patient.update(server=smart.server)
         print(result)
         return jsonify(result)
@@ -505,11 +503,11 @@ def preparePatientInfo(patientInfo, smart):
             phone.value = patientInfo["mobilePhone"]
             patient.telecom.append(phone)
 
-        if "relationshipStatus" in patientInfo:
-            maritalStatus = CodeableConcept()
-            # maritalStatus.coding = ''
-            maritalStatus.text = patientInfo["relationshipStatus"]
-            patient.maritalStatus = maritalStatus
+    if "relationshipStatus" in patientInfo:
+        maritalStatus = CodeableConcept()
+        # maritalStatus.coding = ''
+        maritalStatus.text = patientInfo["relationshipStatus"]
+        patient.maritalStatus = maritalStatus
 
     return patient
 

@@ -30,7 +30,7 @@ class App extends React.Component {
       return {
         selectedPatientId: null,
         didConsent: true,
-        patientIdText: "35c77a1a-18c5-4399-8a31-5a1e46bba83e",
+        patientIdText: "35c77a1a-18c5-4399-8a31-5a1e46bba83e", // surgical hist
         // patientIdText: "40f680c8-238b-426b-b1c0-1649c780ce69",
       };
     }

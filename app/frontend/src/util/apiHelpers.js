@@ -66,4 +66,17 @@ export const loadPatientList = ({
     );
 };
 
-export const postPatientData = () => {};
+export const savePatientData = ({
+  patientId,
+  data,
+  endpoint = "patient/save",
+  method = "PUT",
+}) => {
+  fetch(`${BASE_URL}/${endpoint}`, {
+    method,
+    body: JSON.stringify({ ...data, id: patientId }),
+    headers: new Headers({
+      "content-type": "application/json",
+    }),
+  });
+};
