@@ -296,10 +296,9 @@ def get_home_medications(patient_id):
     smart = _get_smart()
     results = []
     search = MedicationStatement.where({
-        'subject': f'Patient/{patient_id}',
-        'code': 'http://www.nlm.nih.gov/research/umls/rxnorm|'
+        'subject': f'Patient/{patient_id}'
     })
-    meds = search.perform_resources(smart.server)  # type: List[MedicationStatement]
+    meds = search.perform_resources(smart.server)
     med: MedicationStatement
     for med in meds:
         med_obj = {
@@ -334,33 +333,32 @@ def get_home_medications(patient_id):
                     med_obj["medication"]["code"] = med.medicationCodeableConcept.coding[0].code
                 if med.medicationCodeableConcept.coding[0].display:
                     med_obj["medication"]["display"] = med.medicationCodeableConcept.coding[0].display
-        if med.reasonCode:
-            if med.reasonCode.coding and len(med.reasonCode.coding) > 0:
-                if med.reasonCode.coding[0].system:
-                    med_obj["condition"]["system"] = med.reasonCode.coding[0].system
-                if med.reasonCode.coding[0].code:
-                    med_obj["condition"]["code"] = med.reasonCode.coding[0].code
-                if med.reasonCode.coding[0].display:
-                    med_obj["condition"]["display"] = med.reasonCode.coding[0].display
-        if med.dosage:
-            d: Dosage
-            if med.dosage.doseQuantity:
-                if med.dosage.doseQuantity.system:
-                    med_obj["dosage"]["system"] = med.dosage.doseQuantity.system
-                if med.dosage.doseQuantity.code:
-                    med_obj["dosage"]["code"] = med.dosage.doseQuantity.code
-                if med.dosage.doseQuantity.value:
-                    med_obj["dosage"]["value"] = med.dosage.doseQuantity.value
-                if med.dosage.doseQuantity.unit:
-                    med_obj["dosage"]["unit"] = med.dosage.doseQuantity.unit
-            if med.dosage.timing:
-                if med.dosage.timing.repeat:
-                    if med.dosage.timing.repeat.frequency:
-                        med_obj["frequency"]["frequency"] = med.dosage.timing.repeat.frequency
-                    if med.dosage.timing.repeat.period:
-                        med_obj["frequency"]["period"] = med.dosage.timing.repeat.period
-                    if med.dosage.timing.repeat.periodUnit:
-                        med_obj["frequency"]["periodUnit"] = med.dosage.timing.repeat.periodUnit
+        if med.reasonCode and len(med.reasonCode) > 0:
+            if med.reasonCode[0].coding and len(med.reasonCode[0].coding) > 0:
+                if med.reasonCode[0].coding[0].system:
+                    med_obj["condition"]["system"] = med.reasonCode[0].coding[0].system
+                if med.reasonCode[0].coding[0].code:
+                    med_obj["condition"]["code"] = med.reasonCode[0].coding[0].code
+                if med.reasonCode[0].coding[0].display:
+                    med_obj["condition"]["display"] = med.reasonCode[0].coding[0].display
+        if med.dosage and len(med.dosage) > 0:
+            if med.dosage[0].doseQuantity:
+                if med.dosage[0].doseQuantity.system:
+                    med_obj["dosage"]["system"] = med.dosage[0].doseQuantity.system
+                if med.dosage[0].doseQuantity.code:
+                    med_obj["dosage"]["code"] = med.dosage[0].doseQuantity.code
+                if med.dosage[0].doseQuantity.value:
+                    med_obj["dosage"]["value"] = med.dosage[0].doseQuantity.value
+                if med.dosage[0].doseQuantity.unit:
+                    med_obj["dosage"]["unit"] = med.dosage[0].doseQuantity.unit
+            if med.dosage[0].timing:
+                if med.dosage[0].timing.repeat:
+                    if med.dosage[0].timing.repeat.frequency:
+                        med_obj["frequency"]["frequency"] = med.dosage[0].timing.repeat.frequency
+                    if med.dosage[0].timing.repeat.period:
+                        med_obj["frequency"]["period"] = med.dosage[0].timing.repeat.period
+                    if med.dosage[0].timing.repeat.periodUnit:
+                        med_obj["frequency"]["periodUnit"] = med.dosage[0].timing.repeat.periodUnit
         results.append(med_obj)
     return jsonify(results)
 
