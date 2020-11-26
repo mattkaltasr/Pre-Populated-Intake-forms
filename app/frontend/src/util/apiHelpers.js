@@ -1,6 +1,10 @@
-// const DEV_URL = "http://127.0.0.1:8086/api"; // for testing locally
+// const DEV_URL = "http://127.0.0.1:8086/api"; // for testing locall
 
-const BASE_URL = "/pre-populated-intake-forms-app-backend/api";
+const DEV_MODE = true;
+
+const BASE_URL = DEV_MODE
+  ? "http://127.0.0.1:8086/api"
+  : "/pre-populated-intake-forms-app-backend/api";
 
 export const loadPatientInfoById = ({
   patientId,
@@ -61,3 +65,5 @@ export const loadPatientList = ({
       }
     );
 };
+
+export const postPatientData = () => {};

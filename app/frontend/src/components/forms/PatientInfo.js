@@ -48,6 +48,7 @@ const PatientInfo = ({ selectedPatientId }) => {
                 title="First"
                 isRequired
                 grow
+                disabled={!!patientData.firstName}
                 onChange={(v) => setFieldValue("firstName", v)}
                 value={patientAnswers.firstName}
                 valueDiffers={
@@ -60,6 +61,7 @@ const PatientInfo = ({ selectedPatientId }) => {
                 isRequired
                 small
                 grow
+                disabled={!!patientData.middleInitial}
                 onChange={(v) => setFieldValue("middleInitial", v)}
                 value={patientAnswers.middleInitial}
               />
@@ -68,6 +70,7 @@ const PatientInfo = ({ selectedPatientId }) => {
                 title="Last"
                 isRequired
                 grow
+                disabled={!!patientData.lastName}
                 onChange={(v) => setFieldValue("lastName", v)}
                 value={patientAnswers.lastName}
                 valueDiffers={patientAnswers.lastName !== patientData.lastName}
@@ -113,6 +116,7 @@ const PatientInfo = ({ selectedPatientId }) => {
                     ? new Date(patientAnswers.birthDate)
                     : null
                 }
+                disabled={!!patientData.birthDate}
                 onChange={(date) => setFieldValue("birthDate", date)}
               />
               <RadioButtonGroup
