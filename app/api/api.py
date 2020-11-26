@@ -1,12 +1,16 @@
+import json
 import logging
 from datetime import date
-from flask import Flask, request
-from flask import jsonify
+from fhirclient.models.dosage import Dosage
+from fhirclient.models.fhirreference import FHIRReference
+from fhirclient.models.medicationstatement import MedicationStatement
+from fhirclient.models.quantity import Quantity
+from fhirclient.models.timing import Timing
+from flask import Flask, jsonify, request
 from fhirclient import client
 from fhirclient.models.patient import Patient
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.contactpoint import ContactPoint
-from fhirclient.models.codeableconcept import CodeableConcept
 from fhirclient.models.coding import Coding
 from fhirclient.models.address import Address
 from fhirclient.models.fhirdate import FHIRDate
@@ -14,11 +18,18 @@ from fhirclient.models.medicationrequest import MedicationRequest
 from fhirclient.models.medication import Medication
 from fhirclient.models.procedure import Procedure
 from fhirclient.models.condition import Condition
+from fhirclient.models.codeableconcept import CodeableConcept
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.observation import Observation
 from requests.exceptions import HTTPError
 from datetime import datetime
+
+
+def pretty(js):
+    """ pretty print a json object """
+    return json.dumps(js, indent=2)
+
 
 # This is only used later in the query to the FHIR server as an example to the team
 PEDIATRICS_AGE_LIMIT = (
@@ -35,6 +46,7 @@ smart_defaults = {
 app = Flask(__name__)
 from flask_cors import CORS
 CORS(app)
+
 
 # Creates a FHIRClient object and returns it
 def _get_smart():
@@ -237,6 +249,8 @@ def getMedicalHistoryForPatient(id):
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({'error': 'something really bad has happened!'})
 #TODO Get Medications by patient id
+
+
 @app.route('/api/medications/<id>', methods=['GET'])
 def getMedications(id):
     smart = _get_smart()
@@ -470,6 +484,154 @@ def preparePatientInfo(patientInfo, smart):
             patient.maritalStatus = maritalStatus
 
     return patient
+
+
+@app.route('/api/home-meds/<patient_id>')
+def get_home_medications(patient_id):
+    smart = _get_smart()
+    results = []
+    search = MedicationStatement.where({
+        'subject': f'Patient/{patient_id}'
+    })
+    meds = search.perform_resources(smart.server)
+    med: MedicationStatement
+    for med in meds:
+        med_obj = {
+            "id": med.id,
+            "medication": {
+                "system": "",
+                "code": "",
+                "display": ""
+            },
+            "condition": {
+                "system": "",
+                "code": "",
+                "display": ""
+            },
+            "dosage": {
+                "system": "",
+                "code": "",
+                "value": "",
+                "unit": ""
+            },
+            "frequency": {
+                "frequency": "",
+                "period": "",
+                "periodUnit": ""
+            }
+        }
+        if med.medicationCodeableConcept:
+            if med.medicationCodeableConcept.coding and len(med.medicationCodeableConcept.coding) > 0:
+                if med.medicationCodeableConcept.coding[0].system:
+                    med_obj["medication"]["system"] = med.medicationCodeableConcept.coding[0].system
+                if med.medicationCodeableConcept.coding[0].code:
+                    med_obj["medication"]["code"] = med.medicationCodeableConcept.coding[0].code
+                if med.medicationCodeableConcept.coding[0].display:
+                    med_obj["medication"]["display"] = med.medicationCodeableConcept.coding[0].display
+        if med.reasonCode and len(med.reasonCode) > 0:
+            if med.reasonCode[0].coding and len(med.reasonCode[0].coding) > 0:
+                if med.reasonCode[0].coding[0].system:
+                    med_obj["condition"]["system"] = med.reasonCode[0].coding[0].system
+                if med.reasonCode[0].coding[0].code:
+                    med_obj["condition"]["code"] = med.reasonCode[0].coding[0].code
+                if med.reasonCode[0].coding[0].display:
+                    med_obj["condition"]["display"] = med.reasonCode[0].coding[0].display
+        if med.dosage and len(med.dosage) > 0:
+            if med.dosage[0].doseQuantity:
+                if med.dosage[0].doseQuantity.system:
+                    med_obj["dosage"]["system"] = med.dosage[0].doseQuantity.system
+                if med.dosage[0].doseQuantity.code:
+                    med_obj["dosage"]["code"] = med.dosage[0].doseQuantity.code
+                if med.dosage[0].doseQuantity.value:
+                    med_obj["dosage"]["value"] = med.dosage[0].doseQuantity.value
+                if med.dosage[0].doseQuantity.unit:
+                    med_obj["dosage"]["unit"] = med.dosage[0].doseQuantity.unit
+            if med.dosage[0].timing:
+                if med.dosage[0].timing.repeat:
+                    if med.dosage[0].timing.repeat.frequency:
+                        med_obj["frequency"]["frequency"] = med.dosage[0].timing.repeat.frequency
+                    if med.dosage[0].timing.repeat.period:
+                        med_obj["frequency"]["period"] = med.dosage[0].timing.repeat.period
+                    if med.dosage[0].timing.repeat.periodUnit:
+                        med_obj["frequency"]["periodUnit"] = med.dosage[0].timing.repeat.periodUnit
+        results.append(med_obj)
+    return jsonify(results)
+
+
+@app.route('/api/home-med/<med_statement_id>', methods=['PUT'])
+def update_home_medication(med_statement_id):
+    smart = _get_smart()
+    med_statement = MedicationStatement.read(med_statement_id, smart.server)
+    new_medication = request.json.get("medication")
+    new_condition = request.json.get("condition")
+    new_dosage = request.json.get("dosage")
+    new_frequency = request.json.get("frequency")
+    if new_medication:
+        med_statement.medicationCodeableConcept.coding = [Coding(new_medication)]
+        med_statement.medicationCodeableConcept.text = new_medication.get("display")
+    if new_condition:
+        med_statement.reasonCode = [CodeableConcept({
+            "text": new_condition.get("display"),
+            "coding": [new_condition]
+        })]
+    if new_dosage:
+        if med_statement.dosage and len(med_statement.dosage) > 0:
+            med_statement.dosage[0].doseQuantity = Quantity(new_dosage)
+        else:
+            med_statement.dosage = [Dosage({"doseQuantity": new_dosage})]
+    if new_frequency:
+        if med_statement.dosage and len(med_statement.dosage) > 0:
+            med_statement.dosage[0].timing = Timing({"repeat": new_frequency})
+        else:
+            med_statement.dosage = [Dosage({"timing": {"repeat": new_frequency}})]
+    try:
+        result = med_statement.update(smart.server)
+        if result:
+            return jsonify({"result": "success", "fhir-response": result})
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'bad request payload'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
+
+
+@app.route('/api/home-med/<patient_id>', methods=['POST'])
+def create_home_medication(patient_id):
+    smart = _get_smart()
+    med_statement = MedicationStatement()
+    new_medication = request.json.get("medication")
+    new_condition = request.json.get("condition")
+    new_dosage = request.json.get("dosage")
+    new_frequency = request.json.get("frequency")
+    med_statement.subject = FHIRReference({"reference": f"Patient/{patient_id}"})
+    med_statement.status = "active"
+    med_statement.taken = "y"
+    if new_medication:
+        med_statement.medicationCodeableConcept = CodeableConcept({"coding": [new_medication], "text": new_medication.get("display")})
+    if new_condition:
+        med_statement.reasonCode = [CodeableConcept({
+            "text": new_condition.get("display"),
+            "coding": [new_condition]
+        })]
+    if new_dosage or new_frequency:
+        med_statement.dosage = [Dosage()]
+    if new_dosage:
+        med_statement.dosage[0].doseQuantity = Quantity(new_dosage)
+    if new_frequency:
+        med_statement.dosage[0].timing = Timing({"repeat": new_frequency})
+
+    try:
+        result = med_statement.create(smart.server)
+        if result:
+            return jsonify({"result": "success", "fhir-response": result})
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'bad request payload'})
+    except HTTPError as e:
+        print(e)
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 
 # start the app
 if "__main__" == __name__:
