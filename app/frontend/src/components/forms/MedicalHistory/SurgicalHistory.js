@@ -1,9 +1,18 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/no-unused-prop-types */
 import React from "react";
-import PropTypes from "prop-types";
 import _ from "lodash";
 import TableRow from "./TableRow";
 
-const SurgicalHistory = ({ setMedicationValue, patientMedications }) => {
+const SurgicalHistory = ({ patientAnswersSurgical }) => {
+  const surgical = patientAnswersSurgical.surgical || [];
+  const sliced = surgical.slice(surgical.length - 3, surgical.length);
+
+  const normalized =
+    sliced.length < 3
+      ? [...sliced, ..._.range(0, 3 - sliced.length).map(() => ({}))]
+      : sliced;
+
   return (
     <div
       className="flex flex-col"
@@ -39,32 +48,27 @@ const SurgicalHistory = ({ setMedicationValue, patientMedications }) => {
             <strong>Year</strong>
           </div>
         </div>
-        <TableRow
-          rowData={[
-            { field: "medication", value: "N/A" },
-            { field: "Reaction", value: "none" },
-          ]}
-        />
-        <TableRow
-          rowData={[
-            { field: "medication", value: "N/A" },
-            { field: "Reaction", value: "none" },
-          ]}
-        />
-        <TableRow
-          rowData={[
-            { field: "medication", value: "N/A" },
-            { field: "Reaction", value: "none" },
-          ]}
-        />
+        {normalized.map((s) => {
+          return (
+            <TableRow
+              key={s.code}
+              onChange={() => {}}
+              rowData={[
+                { field: "code", value: s.display, disabled: true },
+                {
+                  field: "year",
+                  value: s.date ? new Date(s.date).getFullYear() : "",
+                  disabled: true,
+                },
+              ]}
+            />
+          );
+        })}
       </div>
     </div>
   );
 };
 
-SurgicalHistory.propTypes = {
-  setMedicationValue: PropTypes.func.isRequired,
-  patientMedications: PropTypes.arrayOf(PropTypes.object).isRequired,
-};
+SurgicalHistory.propTypes = {};
 
 export default SurgicalHistory;

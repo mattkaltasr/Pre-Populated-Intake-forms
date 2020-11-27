@@ -12,26 +12,31 @@ import HealthHabits from "./MedicalHistory/HealthHabits";
 import FamilyMedicalHistory from "./MedicalHistory/FamilyMedicalHistory";
 
 const conditions = [
-  { label: "Anxiety", code: "48694002" },
-  { label: "Asthma", code: "195967001" },
-  { label: "Arthritis", code: "202031002" },
-  { label: "Cancer", code: "395099008" },
-  { label: "Diabetes", code: "48694002" }, // ??
-  { label: "Depression", code: "35489007" }, // depressive disorder
-  { label: "Heart Attack", code: "22298006" },
-  { label: "High Blood Pressure", code: "38341003" },
-  { label: "HIV/AIDS", code: "19030005" },
-  { label: "Kidney Stones", code: "64033007" },
-  { label: "Seizures", code: "230433003" },
-  { label: "Stroke", code: "230690007" },
-  { label: "Thyroid Disease", code: "14304000" },
+  { display: "Anxiety", code: "48694002" },
+  { display: "Asthma", code: "195967001" },
+  { display: "Arthritis", code: "202031002" },
+  { display: "Cancer", code: "395099008" },
+  { display: "Diabetes", code: "486940021" }, // ??
+  { display: "Depression", code: "35489007" }, // depressive disorder
+  { display: "Heart Attack", code: "22298006" },
+  { display: "High Blood Pressure", code: "38341003" },
+  { display: "HIV/AIDS", code: "19030005" },
+  { display: "Kidney Stones", code: "64033007" },
+  { display: "Seizures", code: "230433003" },
+  { display: "Stroke", code: "230690007" },
+  { display: "Thyroid Disease", code: "14304000" },
+  { display: "Tuberculosis", code: "56717001" },
+  { display: "Sore Throat", code: "43878008" },
 ];
+
+const codeToCondition = _.keyBy(conditions, (c) => c.code);
 
 /** these should probably be stowed away in a
  *  css class, but that would require wiring up
  *  an additional prop in each formElement to handle
  *  concatenating an exogenous class. OK for now
- *  */
+ */
+
 const checkboxStyle = {
   padding: "0.25em",
   border: "1px solid lightgray",
@@ -43,16 +48,43 @@ const checkboxStyle = {
 };
 
 const MedicalHistory = ({ selectedPatientId }) => {
-  const [otherCondition, setOther] = React.useState("");
+  const [patientAnswersMedications, setAnswersMedications] = React.useState({}); // hold patient/user responses
+  const [patientDataMedications, setPatientDataMedications] = React.useState(
+    {}
+  ); // "immutable" copy of fhir data
 
-  const [patientAnswers, setAnswers] = React.useState({}); // hold patient/user responses
-  const [patientData, setPatientData] = React.useState({}); // "immutable" copy of fhir data
+  const [patientAnswersConditions, setAnswersConditions] = React.useState({});
+  const [patientDataConditions, setPatientDataConditions] = React.useState({});
 
-  const [error, setError] = React.useState(null);
-  const [isLoading, setLoading] = React.useState(false);
+  const [patientAnswersSurgical, setAnswersSurgical] = React.useState({});
+  const [patientDataSurgical, setPatientDataSurgical] = React.useState({});
 
   React.useEffect(() => {
     if (selectedPatientId) {
+      loadPatientInfoById({
+        patientId: selectedPatientId,
+        endpoint: "conditions",
+        setData: (data) => {
+          const result = data || [];
+
+          if (result) {
+            const truthValues = result.reduce((a, v) => {
+              a[v.code] = true;
+              return a;
+            }, {});
+
+            setAnswersConditions({
+              ...patientAnswersConditions,
+              conditions: truthValues,
+            });
+            setPatientDataConditions({
+              ...patientDataConditions,
+              conditions: truthValues,
+            });
+          }
+        },
+      });
+
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "medications",
@@ -60,34 +92,105 @@ const MedicalHistory = ({ selectedPatientId }) => {
           const result = data || [];
 
           if (result) {
-            setAnswers({ ...patientAnswers, medications: result });
-            setPatientData({ ...patientData, medications: result });
+            setAnswersMedications({
+              ...patientAnswersMedications,
+              medications: result,
+            });
+            setPatientDataMedications({
+              ...patientDataMedications,
+              medications: result,
+            });
           }
         },
-        setError,
-        setLoading,
+      });
+
+      loadPatientInfoById({
+        patientId: selectedPatientId,
+        endpoint: "healthhabits",
+        setData: (data) => {
+          const result = data || [];
+          // console.log("healthhabits: ", data);
+
+          if (result) {
+            console.log("healthabits: ", result);
+            // setAnswersMedications({
+            //   ...patientAnswersMedications,
+            //   medications: result,
+            // });
+            // setPatientDataMedications({
+            //   ...patientDataMedications,
+            //   medications: result,
+            // });
+          }
+        },
+      });
+
+      loadPatientInfoById({
+        patientId: selectedPatientId,
+        endpoint: "Procedure",
+        setData: (data) => {
+          const result = data || [];
+
+          if (result) {
+            setAnswersSurgical({
+              ...patientAnswersSurgical,
+              surgical: result,
+            });
+            setPatientDataSurgical({
+              ...patientDataSurgical,
+              surgical: result,
+            });
+          }
+        },
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPatientId]);
 
-  const setFieldValue = (key, value) =>
-    setAnswers({ ...patientAnswers, [key]: value });
+  const setConditionValue = (key, value) =>
+    setAnswersConditions({
+      ...patientAnswersConditions,
+      conditions: {
+        ...(patientAnswersConditions.conditions || {}),
+        [key]: value,
+      },
+    });
+
+  const setSurgicalValue = (key, value) =>
+    setAnswersSurgical({
+      ...patientAnswersSurgical,
+      surgical: {
+        ...(patientAnswersSurgical.surgical || {}),
+        [key]: value,
+      },
+    });
 
   /** edit a specific medication's field in array */
   const setMedicationValue = (medicationIndex, key, value) =>
-    setAnswers({
-      ...patientAnswers,
-      medications: _.get(patientAnswers, "medications", [])
+    setAnswersMedications({
+      ...patientAnswersMedications,
+      medications: _.get(patientAnswersMedications, "medications", [])
         .slice(0, medicationIndex)
         .concat({
-          ..._.get(patientAnswers, `medications[${medicationIndex}]`, {}),
+          ..._.get(
+            patientAnswersMedications,
+            `medications[${medicationIndex}]`,
+            {}
+          ),
           [key]: value,
         })
         .concat(
-          _.get(patientAnswers, "medications", []).slice(medicationIndex + 1)
+          _.get(patientAnswersMedications, "medications", []).slice(
+            medicationIndex + 1
+          )
         ),
     });
+
+  // console.log(
+  //   "patientData",
+  //   patientAnswersMedications,
+  //   patientAnswersConditions
+  // );
 
   return (
     <FormContainer
@@ -108,7 +211,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
             >
               {conditions.map((r) => {
                 const value = _.get(
-                  patientAnswers,
+                  patientAnswersConditions.conditions,
                   r.code,
                   false // default to not selected
                 );
@@ -116,38 +219,29 @@ const MedicalHistory = ({ selectedPatientId }) => {
                 return (
                   <Checkbox
                     key={r.code}
-                    title={r.label}
+                    title={r.display}
                     checked={!!value}
-                    onChange={() => setFieldValue(r.code, !value)}
+                    onChange={() => setConditionValue(r.code, !value)}
                     style={{ ...checkboxStyle }}
                   />
                 );
               })}
-              {/* <div style={{ ...checkboxStyle }} className="flex">
-                <span style={{ margin: "auto 0.5em auto 0" }}>Other: </span>
-                <input
-                  style={{
-                    flex: 1,
-                    minWidth: "1em",
-                    fontSize: "0.8em",
-                  }}
-                  onChange={({ target: { value } }) => setOther(value)}
-                  value={otherCondition}
-                  className="input-field"
-                />
-              </div> */}
             </div>
           </div>
           <Medications
             setMedicationValue={setMedicationValue}
-            patientMedications={_.get(patientAnswers, "medications", [])}
+            patientMedications={_.get(
+              patientAnswersMedications,
+              "medications",
+              []
+            )}
           />
           <div
             className="flex"
             style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
           >
             <MedicationAllergies />
-            <SurgicalHistory />
+            <SurgicalHistory patientAnswersSurgical={patientAnswersSurgical} />
           </div>
           <HealthHabits />
           <FamilyMedicalHistory />

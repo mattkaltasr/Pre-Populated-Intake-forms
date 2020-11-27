@@ -17,6 +17,7 @@ const TextInput = ({
   valueDiffers,
   small,
   error,
+  disabled,
 }) => {
   return (
     <div
@@ -34,6 +35,7 @@ const TextInput = ({
       <input
         className="input-field"
         value={value || ""}
+        disabled={disabled}
         onChange={({ target: { value: nextValue } }) => onChange(nextValue)}
         placeholder={placeholder || _.lowerCase(title)}
       />
@@ -49,6 +51,7 @@ TextInput.propTypes = {
   isRequired: PropTypes.bool,
   valueDiffers: PropTypes.bool,
   small: PropTypes.bool,
+  disabled: PropTypes.bool,
   placeholder: PropTypes.string,
 };
 
@@ -59,6 +62,7 @@ TextInput.defaultProps = {
   value: null,
   valueDiffers: false,
   small: false,
+  disabled: false,
 };
 
 export default TextInput;

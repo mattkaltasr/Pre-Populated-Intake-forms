@@ -15,6 +15,7 @@ const DateField = ({
   onChange,
   valueDiffers,
   small,
+  ...props
 }) => {
   return (
     <div
@@ -32,6 +33,7 @@ const DateField = ({
         className="input-field"
         selected={value || new Date()}
         onChange={(date) => onChange(date)}
+        {...props}
       />
     </div>
   );
