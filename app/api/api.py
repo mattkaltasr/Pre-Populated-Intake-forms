@@ -1,6 +1,9 @@
 import json
 import logging
 from datetime import date
+
+from fhirclient.models.allergyintolerance import AllergyIntolerance, AllergyIntoleranceReaction
+from fhirclient.models.backboneelement import BackboneElement
 from fhirclient.models.dosage import Dosage
 from fhirclient.models.fhirreference import FHIRReference
 from fhirclient.models.medicationstatement import MedicationStatement
@@ -512,13 +515,12 @@ def preparePatientInfo(patientInfo, smart):
     return patient
 
 
-@app.route("/api/home-meds/<patient_id>")
+@app.route('/api/home-med/<patient_id>', methods=['GET'])
 def get_home_medications(patient_id):
     smart = _get_smart()
     results = []
     search = MedicationStatement.where({"subject": f"Patient/{patient_id}"})
     meds = search.perform_resources(smart.server)
-    med: MedicationStatement
     for med in meds:
         med_obj = {
             "id": med.id,
@@ -660,6 +662,84 @@ def create_home_medication(patient_id):
         print(e)
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({"error": "something really bad has happened!"})
+
+
+
+@app.route('/api/drug-allergy/<patient_id>', methods=['GET'])
+def get_drug_allergies(patient_id):
+    smart = _get_smart()
+    results = []
+    search = AllergyIntolerance.where({
+        'patient': f'Patient/{patient_id}',
+        'category': 'medication'
+    })
+    allergies = search.perform_resources(smart.server)
+    for allergy in allergies:
+        allergy_obj = {
+            "id": allergy.id,
+            "medication": {
+                "system": "",
+                "code": "",
+                "display": ""
+            },
+            "reaction": {
+                "system": "",
+                "code": "",
+                "display": ""
+            }
+        }
+        if allergy.code:
+            if allergy.code.coding and len(allergy.code.coding) > 0:
+                if allergy.code.coding[0].system:
+                    allergy_obj["medication"]["system"] = allergy.code.coding[0].system
+                if allergy.code.coding[0].code:
+                    allergy_obj["medication"]["code"] = allergy.code.coding[0].code
+                if allergy.code.coding[0].display:
+                    allergy_obj["medication"]["display"] = allergy.code.coding[0].display
+        if allergy.reaction and len(allergy.reaction) > 0:
+            if allergy.reaction[0].manifestation and len(allergy.reaction[0].manifestation) > 0:
+                if allergy.reaction[0].manifestation[0].coding and len(allergy.reaction[0].manifestation[0].coding) > 0:
+                    if allergy.reaction[0].manifestation[0].coding[0].system:
+                        allergy_obj["reaction"]["system"] = allergy.reaction[0].manifestation[0].coding[0].system
+                    if allergy.reaction[0].manifestation[0].coding[0].code:
+                        allergy_obj["reaction"]["code"] = allergy.reaction[0].manifestation[0].coding[0].code
+                    if allergy.reaction[0].manifestation[0].coding[0].display:
+                        allergy_obj["reaction"]["display"] = allergy.reaction[0].manifestation[0].coding[0].display
+        results.append(allergy_obj)
+    return jsonify(results)
+
+
+@app.route('/api/drug-allergy/<patient_id>', methods=['POST'])
+def create_drug_allergy(patient_id):
+    smart = _get_smart()
+    drug_allergy = AllergyIntolerance()
+    new_drug_allergy = request.json.get("medication")
+    new_reaction = request.json.get("reaction")
+    drug_allergy.patient = FHIRReference({"reference": f"Patient/{patient_id}"})
+    drug_allergy.verificationStatus = "confirmed"
+    drug_allergy.clinicalStatus = "active"
+    drug_allergy.category = ["medication"]
+    if new_drug_allergy:
+        drug_allergy.code = CodeableConcept({"coding": [new_drug_allergy], "text": new_drug_allergy.get("display")})
+    if new_reaction:
+        drug_allergy.reaction = [AllergyIntoleranceReaction({
+            "manifestation": [{
+                "text": new_reaction.get("display"),
+                "coding": [new_reaction]
+            }]
+        })]
+
+    try:
+        result = drug_allergy.create(smart.server)
+        if result:
+            return jsonify({"result": "success", "fhir-response": result})
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'bad request payload'})
+    except HTTPError as e:
+        print(e)
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
 
 
 # start the app
