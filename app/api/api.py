@@ -413,6 +413,11 @@ def getSurgicalHistoryForPatient(id):
 
 
 # TODO post surgical history
+@app.route("/api/Procedure/<id>", methods==["PUT"])
+def update_SurgicalHistoryForPatient(id):
+# TODO post surgical history
+#needs to add in fields for this unsure of how
+
 
 
 # TODO POST - Patient Info Update
