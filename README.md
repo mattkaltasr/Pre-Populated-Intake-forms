@@ -82,7 +82,7 @@ Start your favorite web browser and navigate to:
     * Get Conditions by Patient Id
     `<BASE_URL>/api/conditions/<id>`
     * Save (PUT) Patient Info
-    `<BASE_URL>/a/api/patient/save`
+    `<BASE_URL>/api/patient/save`
         
         Note: Name, Birthdate excluded from patient save
             
@@ -101,6 +101,24 @@ Start your favorite web browser and navigate to:
                   "relationshipStatus": "M",
                   "state": "MA"
                 }
+    * Add (PUT) Conditions
+        `<BASE_URL>/api/conditions/<patient_id>`
+            
+        The endpoint expects a list of new conditions that need to be added to the patient
+            
+        Sample body json:
+                    
+                [{
+                        "code": "38341003",
+                        "display": "Hypertension",
+                        "system": "http://snomed.info/sct"
+                    },
+                     {
+                        "system": "http://snomed.info/sct",
+                        "code": "22298006",
+                        "display": "Myocardial Infarction"
+                    }]
+
   
     
     
