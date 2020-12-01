@@ -610,8 +610,8 @@ def getSurgicalHistoryForPatient(id):
     # needs to add in fields for this unsure of how
 
     # POST - Patient Info Update
-    # @app.route("/api/patient/save", methods=["PUT"])
-    # def updatePatient():
+@app.route("/api/patient/save", methods=["PUT"])
+def updatePatient():
     smart = _get_smart()
     try:
         # prep patient info
