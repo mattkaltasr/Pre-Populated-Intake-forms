@@ -194,7 +194,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
 
       loadPatientInfoById({
         patientId: selectedPatientId,
-        endpoint: "Procedure",
+        endpoint: "procedure",
         setLoading,
         setData: (data) => {
           const result = data || [];
