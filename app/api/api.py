@@ -25,6 +25,8 @@ from fhirclient.models.codeableconcept import CodeableConcept
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.observation import Observation
+from fhirclient.models.familymemberhistory import FamilyMemberHistory
+
 from requests.exceptions import HTTPError
 from datetime import datetime
 
@@ -426,6 +428,57 @@ def getHealthHabitsForPatient(id):
 
 
 # TODO Get Family Medical History
+# BEST PATIENT:40f680c8-238b-426b-b1c0-1649c780ce69
+# MFSB all with diabetes
+# + 2 heart disease, 1 cancer, 1 asthma
+# 1e19bb7a-d990-4924-9fae-be84f19c53c1:    Mother and father with hypertension
+
+@app.route('/api/family_member_history/<id>', methods=['GET'])
+def get_family_member_history_for_patient(id):
+    smart = _get_smart()
+    """
+    Get Family Member History Observations by patient id
+    """
+    try:
+        results = []
+        p_search = FamilyMemberHistory.where(struct={'patient': "Patient/" + str(id)})
+        p_history = p_search.perform_resources(smart.server)
+        print(id)
+        print(len(p_history))
+
+        for hist in p_history:
+            for i in range(len(hist.condition)):
+                relationship = ''
+                if hist.relationship:
+                    relationship = hist.relationship.coding[0].display.lower()
+                code = ''
+                display = ''
+                hist_id = ''
+                system = ''
+                if hist.condition:
+                    code = hist.condition[i].code.coding[0].code
+                    display = hist.condition[i].code.coding[0].display
+                    system = hist.condition[i].code.coding[0].system
+                if hist.id:
+                    hist_id = hist.id
+                if relationship not in ['mother', 'father', 'sister', 'brother']:
+                    relationship = ''
+
+                details = {"code": code, "display": display, "id": hist_id, "system": system}
+                results.append({"condition": details, "relationship": relationship})
+
+        # results.sort(key=lambda m: m.get("display"))
+        return jsonify(results)
+
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
+                                            not valid there'})
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({'error': 'something really bad has happened!'})
+
+
 # TODO get surgical history
 @app.route("/api/Procedure/<id>", methods=["GET"])
 def getSurgicalHistoryForPatient(id):
@@ -469,16 +522,16 @@ def getSurgicalHistoryForPatient(id):
 
 
 # TODO post surgical history
-@app.route("/api/Procedure/<id>", methods==["PUT"])
-def update_SurgicalHistoryForPatient(id):
+# @app.route("/api/Procedure/<id>", methods==["PUT"])
+# def update_SurgicalHistoryForPatient(id):
 # TODO post surgical history
 #needs to add in fields for this unsure of how
 
 
 
 # POST - Patient Info Update
-@app.route("/api/patient/save", methods=["PUT"])
-def updatePatient():
+# @app.route("/api/patient/save", methods=["PUT"])
+# def updatePatient():
     smart = _get_smart()
     try:
         # prep patient info
