@@ -28,6 +28,8 @@ from fhirclient.models.codeableconcept import CodeableConcept
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.observation import Observation
+from fhirclient.models.familymemberhistory import FamilyMemberHistory
+
 from requests.exceptions import HTTPError
 from datetime import datetime
 
@@ -46,6 +48,23 @@ PEDIATRICS_AGE_LIMIT = (
 smart_defaults = {
     "app_id": "pre_populated_intake_froms",
     "api_base": "https://apps.hdap.gatech.edu/syntheticmass/baseDstu3",
+    # "api_base": "https://hapi.fhir.org/baseDstu3",
+}
+conditions_list = {
+    "38341003": "HyperTension",
+    "53741008": "Coronary Heart Disease",
+    "195967001": "Asthma (disorder)",
+    "197480006": "Anxiety disorder (disorder)",
+    "3723001": "Arthritis (disorder)",
+    "73211009": "Diabetes mellitus (disorder)",
+    "35489007": "Depressive disorder (disorder)",
+    "56265001": "Heart disease (disorder)",
+    "42343007": "Congestive heart failure (disorder)",
+    "86406008": "Human immunodeficiency virus infection (disorder)",
+    "95570007": "Kidney stone (disorder)",
+    "84757009": "Epilepsy (disorder)",
+    "14304000": "Disorder of thyroid gland (disorder)",
+    "56717001": "Tuberculosis (disorder)",
 }
 
 # "api_base": "http://hapi.fhir.org/baseDstu3",
@@ -234,7 +253,7 @@ def getPatient(id):
         return jsonify({"error": "something really bad has happened!"})
 
 
-# TODO Get Medical history by patient id
+# Get Medical history by patient id
 @app.route("/api/conditions/<id>", methods=["GET"])
 def getMedicalHistoryForPatient(id):
     smart = _get_smart()
@@ -243,15 +262,22 @@ def getMedicalHistoryForPatient(id):
     # 1e19bb7a-d990-4924-9fae-be84f19c53c1
     try:
         results = []
-        p_search = Condition.where(struct={"subject": "Patient/" + str(id)})
+        p_search = Condition.where({"subject": f"Patient/{id}"})
         p_conditions = p_search.perform_resources(smart.server)
         for cond in p_conditions:
             code = ""
             display = ""
+            system = ""
+            id = ""
             if cond.code:
+                id = cond.id
                 code = cond.code.coding[0].code
                 display = cond.code.coding[0].display
-            results.append({"code": code, "display": display})
+                system = cond.code.coding[0].system
+
+            results.append(
+                {"id": id, "code": code, "display": display, "system": system}
+            )
         results.sort(key=lambda m: m.get("display"))
         return jsonify(results)
 
@@ -268,9 +294,54 @@ def getMedicalHistoryForPatient(id):
         return jsonify({"error": "something really bad has happened!"})
 
 
-# TODO Get Medications by patient id
+# PUT Medical History
+# only add the new ones (UI to send only the new selected conditions)
+@app.route("/api/conditions/<patient_id>", methods=["PUT"])
+def addMedicalConditionsForPatient(patient_id):
+    smart = _get_smart()
+    p_search = Condition.where({"subject": f"Patient/{patient_id}"})
+    p_conditions = p_search.perform_resources(smart.server)
+    new_conditions = request.json
+
+    print("new_conditions", new_conditions)
+
+    # add new ones to existing conditions
+    result = []
+    for cond in new_conditions:
+
+        print(cond.get("code") in conditions_list.keys())
+
+        new_condition = Condition()
+
+        if cond.get("code"):
+            coding_cond = {
+                "system": "http://snomed.info/sct",
+                "display": cond.get("display"),
+                "code": cond.get("code"),
+            }
+            new_condition.code = CodeableConcept(
+                {"text": cond.get("display"), "coding": [coding_cond]}
+            )
+            new_condition.subject = FHIRReference(
+                {"reference": f"Patient/{patient_id}"}
+            )
+            new_condition.clinicalStatus = "active"
+            try:
+                status = new_condition.create(server=smart.server)
+                if status:
+                    result.append({"result": "success", "fhir-response": status})
+                    print(result)
+            except FHIRValidationError:
+                # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+                result.append(jsonify({"error": "bad request payload"}))
+            except HTTPError:
+                # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+                result.append(jsonify({"error": "something really bad has happened!"}))
+    return jsonify(result)
 
 
+# Get Medications by patient id
+# TODO to be deleted as home-meds functions will be used in place
 @app.route("/api/medications/<id>", methods=["GET"])
 def getMedications(id):
     smart = _get_smart()
@@ -377,6 +448,72 @@ def getHealthHabitsForPatient(id):
 
 
 # TODO Get Family Medical History
+
+# requires "api_base": "https://hapi.fhir.org/baseDstu3",
+# patient id:  2743900
+# returns a prostate cancer history item
+@app.route("/api/family_member_history/<id>", methods=["GET"])
+def get_family_member_history_for_patient(id):
+    smart = _get_smart()
+    """
+    Get Family Member History Observations by patient id
+    """
+
+    try:
+        results = []
+        p_search = FamilyMemberHistory.where(struct={"patient": "Patient/" + str(id)})
+        p_history = p_search.perform_resources(smart.server)
+        print(id)
+        print(len(p_history))
+
+        for hist in p_history:
+            brief_display = ""
+            relationship = ""
+            if hist.relationship:
+                relationship = hist.relationship.coding[0].display.lower()
+            code = ""
+            display = ""
+            hist_id = ""
+            system = ""
+            if hist.condition:
+                code = hist.condition[0].code.coding[0].code
+                display = hist.condition[0].code.coding[0].display
+                system = hist.condition[0].code.coding[0].system
+            if hist.id:
+                hist_id = hist.id
+            if relationship not in ["mother", "father", "sister", "brother"]:
+                relationship = ""
+
+            for form_condition in ["cancer", "heart", "diabetes"]:
+                if "cancer" in form_condition:
+                    brief_display = form_condition
+
+            if relationship != "" and brief_display != "":
+                brief = {"brief_display": brief_display, "relationship": relationship}
+                details = {
+                    "code": code,
+                    "display": display,
+                    "id": hist_id,
+                    "system": system,
+                }
+                results.append({"brief": brief, "details": details})
+
+        # results.sort(key=lambda m: m.get("display"))
+        return jsonify(results)
+
+    except FHIRValidationError:
+        # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
+        return jsonify(
+            {
+                "error": "sorry, we' querying a public server and someone must have entered something \
+                                            not valid there"
+            }
+        )
+    except HTTPError:
+        # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
+        return jsonify({"error": "something really bad has happened!"})
+
+
 # TODO get surgical history
 @app.route("/api/Procedure/<id>", methods=["GET"])
 def getSurgicalHistoryForPatient(id):
@@ -420,15 +557,13 @@ def getSurgicalHistoryForPatient(id):
 
 
 # TODO post surgical history
-@app.route("/api/Procedure/<id>", methods=["PUT"])
-def update_SurgicalHistoryForPatient(id):
-    # TODO post surgical history
-    # needs to add in fields for this unsure of how
-    pass
+# @app.route("/api/Procedure/<id>", methods==["PUT"])
+# def update_SurgicalHistoryForPatient(id):
+# TODO post surgical history
+# needs to add in fields for this unsure of how
 
 
-# TODO POST - Patient Info Update
-# WIP
+# POST - Patient Info Update
 @app.route("/api/patient/save", methods=["PUT"])
 def updatePatient():
     smart = _get_smart()

@@ -37,8 +37,6 @@ const PatientInfo = ({ selectedPatientId }) => {
     setIsSubmitted(false);
   };
 
-  console.log("patientData", patientData);
-
   return (
     <FormContainer
       title="Patient Info"

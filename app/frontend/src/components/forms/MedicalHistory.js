@@ -31,6 +31,8 @@ const conditions = [
   { display: "Sore Throat", code: "43878008" },
 ];
 
+const conditionByCode = _.keyBy(conditions, (c) => c.code);
+
 /** these should probably be stowed away in a
  *  css class, but that would require wiring up
  *  an additional prop in each formElement to handle
@@ -59,11 +61,15 @@ const MedicalHistory = ({ selectedPatientId }) => {
   const [patientAnswersSurgical, setAnswersSurgical] = React.useState({});
   const [patientDataSurgical, setPatientDataSurgical] = React.useState({});
 
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [isLoading, setLoading] = React.useState(false);
+
   React.useEffect(() => {
     if (selectedPatientId) {
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "conditions",
+        setLoading,
         setData: (data) => {
           const result = data || [];
 
@@ -88,6 +94,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "medications",
+        setLoading,
         setData: (data) => {
           const result = data || [];
 
@@ -107,6 +114,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "healthhabits",
+        setLoading,
         setData: (data) => {
           const result = data || [];
           // console.log("healthhabits: ", data);
@@ -128,6 +136,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "Procedure",
+        setLoading,
         setData: (data) => {
           const result = data || [];
 
@@ -147,7 +156,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPatientId]);
 
-  const setConditionValue = (key, value) =>
+  const setConditionValue = (key, value) => {
     setAnswersConditions({
       ...patientAnswersConditions,
       conditions: {
@@ -155,8 +164,10 @@ const MedicalHistory = ({ selectedPatientId }) => {
         [key]: value,
       },
     });
+    setIsSubmitted(false);
+  };
 
-  const setSurgicalValue = (key, value) =>
+  const setSurgicalValue = (key, value) => {
     setAnswersSurgical({
       ...patientAnswersSurgical,
       surgical: {
@@ -164,6 +175,8 @@ const MedicalHistory = ({ selectedPatientId }) => {
         [key]: value,
       },
     });
+    setIsSubmitted(false);
+  };
 
   /** edit a specific medication's field in array */
   const setMedicationValue = (medicationIndex, key, value) =>
@@ -245,28 +258,34 @@ const MedicalHistory = ({ selectedPatientId }) => {
           </div>
           <Button
             style={{ margin: "1em auto auto 0", width: "10em" }}
-            // text={isSubmitted ? "Saved" : "Submit"}
-            // disabled={isLoading || isSubmitted}
+            text={isSubmitted ? "Saved" : "Submit"}
+            disabled={isLoading || isSubmitted}
             onClick={() => {
-              // setLoading(true);
-              // /**
-              //  * BAD: should only submit fields that have actually changed here,
-              //  * rather than every possible field
-              //  *
-              //  */
-              // savePatientData({
-              //   patientId: selectedPatientId,
-              //   data: {
-              //   },
-              // });
-              // /**
-              //  * this is a really, really bad pattern. We are assuming that the answers
-              //  * submitted by the patient are completely valid and that there are no
-              //  * errors in the backend. But, in the interest of time ...
-              //  */
-              // setPatientData({ ...patientData, ...patientAnswers });
-              // setLoading(false);
-              // setIsSubmitted(true);
+              setLoading(true);
+              /**
+               * first update conditions
+               */
+              const conditionPayload = Object.keys(
+                patientAnswersConditions.conditions
+              )
+                .filter(
+                  (k) =>
+                    patientAnswersConditions.conditions[k] && conditionByCode[k]
+                )
+                .map((code) => ({
+                  code,
+                  display: conditionByCode[code].display,
+                }));
+
+              savePatientData({
+                endpoint: `conditions/${selectedPatientId}`,
+                patientId: selectedPatientId,
+                asArray: true,
+                data: conditionPayload,
+              });
+
+              setLoading(false);
+              setIsSubmitted(true);
             }}
           />
         </div>
