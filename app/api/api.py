@@ -2,7 +2,10 @@ import json
 import logging
 from datetime import date
 
-from fhirclient.models.allergyintolerance import AllergyIntolerance, AllergyIntoleranceReaction
+from fhirclient.models.allergyintolerance import (
+    AllergyIntolerance,
+    AllergyIntoleranceReaction,
+)
 from fhirclient.models.backboneelement import BackboneElement
 from fhirclient.models.dosage import Dosage
 from fhirclient.models.fhirreference import FHIRReference
@@ -25,7 +28,8 @@ from fhirclient.models.codeableconcept import CodeableConcept
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.observation import Observation
-from fhirclient.models.familymemberhistory import FamilyMemberHistory
+from fhirclient.models.familymemberhistory import FamilyMemberHistory, FamilyMemberHistoryCondition
+
 
 from requests.exceptions import HTTPError
 from datetime import datetime
@@ -45,6 +49,7 @@ PEDIATRICS_AGE_LIMIT = (
 smart_defaults = {
     "app_id": "pre_populated_intake_froms",
     "api_base": "https://apps.hdap.gatech.edu/syntheticmass/baseDstu3",
+    # "api_base": "https://hapi.fhir.org/baseDstu3",
 }
 conditions_list = {
     "38341003": "HyperTension",
@@ -60,14 +65,19 @@ conditions_list = {
     "95570007": "Kidney stone (disorder)",
     "84757009": "Epilepsy (disorder)",
     "14304000": "Disorder of thyroid gland (disorder)",
-    "56717001": "Tuberculosis (disorder)"
+    "56717001": "Tuberculosis (disorder)",
 }
-
+family_member = {
+    "father" : "FTH",
+    "mother" : "MTH",
+    "brother" : "BRO",
+    "sister" : "SIS"
+}
 # Flask app setup
 app = Flask(__name__)
 from flask_cors import CORS
 
-# CORS(app)
+CORS(app)
 
 
 # Creates a FHIRClient object and returns it
@@ -169,9 +179,11 @@ def getPatient(id):
             # address
             if len(patient.address) > 0:
                 for add in patient.address:
-                    for addr_line in add.line:
-                        if addr_line:
-                            address = addr_line
+
+                    if add.line is not None:
+                        for addr_line in add.line:
+                            if addr_line:
+                                address = addr_line
                     if add.city:
                         city = add.city
                     if add.postalCode:
@@ -267,7 +279,9 @@ def getMedicalHistoryForPatient(id):
                 display = cond.code.coding[0].display
                 system = cond.code.coding[0].system
 
-            results.append({"id": id, "code": code, "display": display,"system": system})
+            results.append(
+                {"id": id, "code": code, "display": display, "system": system}
+            )
         results.sort(key=lambda m: m.get("display"))
         return jsonify(results)
 
@@ -283,8 +297,9 @@ def getMedicalHistoryForPatient(id):
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({"error": "something really bad has happened!"})
 
-#PUT Medical History
-#only add the new ones (UI to send only the new selected conditions)
+
+# PUT Medical History
+# only add the new ones (UI to send only the new selected conditions)
 @app.route("/api/conditions/<patient_id>", methods=["PUT"])
 def addMedicalConditionsForPatient(patient_id):
     smart = _get_smart()
@@ -292,20 +307,28 @@ def addMedicalConditionsForPatient(patient_id):
     p_conditions = p_search.perform_resources(smart.server)
     new_conditions = request.json
 
-    #add new ones to existing conditions
-    result=[]
+    print("new_conditions", new_conditions)
+
+    # add new ones to existing conditions
+    result = []
     for cond in new_conditions:
 
-        print(cond.get('code') in conditions_list.keys())
+        print(cond.get("code") in conditions_list.keys())
 
         new_condition = Condition()
 
-        if cond.get('code'):
-            coding_cond={"system":"http://snomed.info/sct","display":cond.get('display'),"code":cond.get('code')}
+        if cond.get("code"):
+            coding_cond = {
+                "system": "http://snomed.info/sct",
+                "display": cond.get("display"),
+                "code": cond.get("code"),
+            }
             new_condition.code = CodeableConcept(
                 {"text": cond.get("display"), "coding": [coding_cond]}
             )
-            new_condition.subject = FHIRReference({"reference": f"Patient/{patient_id}"})
+            new_condition.subject = FHIRReference(
+                {"reference": f"Patient/{patient_id}"}
+            )
             new_condition.clinicalStatus = "active"
             try:
                 status = new_condition.create(server=smart.server)
@@ -319,6 +342,7 @@ def addMedicalConditionsForPatient(patient_id):
                 # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
                 result.append(jsonify({"error": "something really bad has happened!"}))
     return jsonify(result)
+
 
 # Get Medications by patient id
 # TODO to be deleted as home-meds functions will be used in place
@@ -427,7 +451,8 @@ def getHealthHabitsForPatient(id):
         return jsonify({"error": "something really bad has happened!"})
 
 
-# TODO Get Family Medical History
+
+# Get Family Medical History
 # BEST PATIENT:40f680c8-238b-426b-b1c0-1649c780ce69
 # MFSB all with diabetes
 # + 2 heart disease, 1 cancer, 1 asthma
@@ -441,7 +466,8 @@ def get_family_member_history_for_patient(id):
     """
     try:
         results = []
-        p_search = FamilyMemberHistory.where(struct={'patient': "Patient/" + str(id)})
+        p_search = FamilyMemberHistory.where(struct={"patient": "Patient/" + str(id)})
+
         p_history = p_search.perform_resources(smart.server)
         print(id)
         print(len(p_history))
@@ -479,6 +505,47 @@ def get_family_member_history_for_patient(id):
         return jsonify({'error': 'something really bad has happened!'})
 
 
+#POST Family Medical History
+@app.route("/api/family_member_history/<patient_id>", methods=["POST"])
+def addConditionsForFamilyForPatient(patient_id):
+    smart = _get_smart()
+    #p_search = FamilyMemberHistory.where({"subject": f"Patient/{patient_id}"})
+    #p_familymembers_history = p_search.perform_resources(smart.server)
+    new_familymember_history = request.json
+
+    #for each family family_member add condition(s)
+    result=[]
+    for history in new_familymember_history:
+
+        familymemberhistory = FamilyMemberHistory()
+
+        coding_relationship={"system":"http://hl7.org/fhir/v3/RoleCode","display":history.get('relationship'),"code":family_member.get(history.get('relationship'))}
+        familymemberhistory.relationship = CodeableConcept(
+            {"text": history.get('relationship'), "coding": [coding_relationship]}
+        )
+
+        familymemberhistory.patient = FHIRReference({"reference": f"Patient/{patient_id}"})
+        familymemberhistory.status = "completed"
+        new_conditions = []
+        #familymemberhistory.condition = []
+        #print(familymemberhistory)
+        for cond in history.get('condition'):
+            #one family family_member can have multiple conditions
+            coding_cond={"system":"http://snomed.info/sct","display":cond.get('display'),"code":cond.get('code')}
+            familycondition = FamilyMemberHistoryCondition()
+            familycondition.code = CodeableConcept(
+                {"text": cond.get('display'), "coding": [coding_cond]}
+            )
+            new_conditions.append(familycondition)
+        familymemberhistory.condition = new_conditions
+        status = familymemberhistory.create(server=smart.server)
+        if status:
+            result.append({"result": "success", "fhir-response": status})
+            #print(result)
+
+
+    return jsonify(result)
+
 # TODO get surgical history
 @app.route("/api/Procedure/<id>", methods=["GET"])
 def getSurgicalHistoryForPatient(id):
@@ -490,8 +557,7 @@ def getSurgicalHistoryForPatient(id):
         results = []
         p_search = Procedure.where(struct={"subject": "Patient/" + str(id)})
         p_procedure = p_search.perform_resources(smart.server)
-        print(id)
-        print(len(p_procedure))
+
         for proc in p_procedure:
             code = ""
             display = ""
@@ -525,8 +591,7 @@ def getSurgicalHistoryForPatient(id):
 # @app.route("/api/Procedure/<id>", methods==["PUT"])
 # def update_SurgicalHistoryForPatient(id):
 # TODO post surgical history
-#needs to add in fields for this unsure of how
-
+# needs to add in fields for this unsure of how
 
 
 # POST - Patient Info Update
@@ -628,7 +693,7 @@ def preparePatientInfo(patientInfo, smart):
     return patient
 
 
-@app.route('/api/home-med/<patient_id>', methods=['GET'])
+@app.route("/api/home-med/<patient_id>", methods=["GET"])
 def get_home_medications(patient_id):
     smart = _get_smart()
     results = []
@@ -777,29 +842,19 @@ def create_home_medication(patient_id):
         return jsonify({"error": "something really bad has happened!"})
 
 
-
-@app.route('/api/drug-allergy/<patient_id>', methods=['GET'])
+@app.route("/api/drug-allergy/<patient_id>", methods=["GET"])
 def get_drug_allergies(patient_id):
     smart = _get_smart()
     results = []
-    search = AllergyIntolerance.where({
-        'patient': f'Patient/{patient_id}',
-        'category': 'medication'
-    })
+    search = AllergyIntolerance.where(
+        {"patient": f"Patient/{patient_id}", "category": "medication"}
+    )
     allergies = search.perform_resources(smart.server)
     for allergy in allergies:
         allergy_obj = {
             "id": allergy.id,
-            "medication": {
-                "system": "",
-                "code": "",
-                "display": ""
-            },
-            "reaction": {
-                "system": "",
-                "code": "",
-                "display": ""
-            }
+            "medication": {"system": "", "code": "", "display": ""},
+            "reaction": {"system": "", "code": "", "display": ""},
         }
         if allergy.code:
             if allergy.code.coding and len(allergy.code.coding) > 0:
@@ -808,21 +863,35 @@ def get_drug_allergies(patient_id):
                 if allergy.code.coding[0].code:
                     allergy_obj["medication"]["code"] = allergy.code.coding[0].code
                 if allergy.code.coding[0].display:
-                    allergy_obj["medication"]["display"] = allergy.code.coding[0].display
+                    allergy_obj["medication"]["display"] = allergy.code.coding[
+                        0
+                    ].display
         if allergy.reaction and len(allergy.reaction) > 0:
-            if allergy.reaction[0].manifestation and len(allergy.reaction[0].manifestation) > 0:
-                if allergy.reaction[0].manifestation[0].coding and len(allergy.reaction[0].manifestation[0].coding) > 0:
+            if (
+                allergy.reaction[0].manifestation
+                and len(allergy.reaction[0].manifestation) > 0
+            ):
+                if (
+                    allergy.reaction[0].manifestation[0].coding
+                    and len(allergy.reaction[0].manifestation[0].coding) > 0
+                ):
                     if allergy.reaction[0].manifestation[0].coding[0].system:
-                        allergy_obj["reaction"]["system"] = allergy.reaction[0].manifestation[0].coding[0].system
+                        allergy_obj["reaction"]["system"] = (
+                            allergy.reaction[0].manifestation[0].coding[0].system
+                        )
                     if allergy.reaction[0].manifestation[0].coding[0].code:
-                        allergy_obj["reaction"]["code"] = allergy.reaction[0].manifestation[0].coding[0].code
+                        allergy_obj["reaction"]["code"] = (
+                            allergy.reaction[0].manifestation[0].coding[0].code
+                        )
                     if allergy.reaction[0].manifestation[0].coding[0].display:
-                        allergy_obj["reaction"]["display"] = allergy.reaction[0].manifestation[0].coding[0].display
+                        allergy_obj["reaction"]["display"] = (
+                            allergy.reaction[0].manifestation[0].coding[0].display
+                        )
         results.append(allergy_obj)
     return jsonify(results)
 
 
-@app.route('/api/drug-allergy/<patient_id>', methods=['POST'])
+@app.route("/api/drug-allergy/<patient_id>", methods=["POST"])
 def create_drug_allergy(patient_id):
     smart = _get_smart()
     drug_allergy = AllergyIntolerance()
@@ -833,14 +902,19 @@ def create_drug_allergy(patient_id):
     drug_allergy.clinicalStatus = "active"
     drug_allergy.category = ["medication"]
     if new_drug_allergy:
-        drug_allergy.code = CodeableConcept({"coding": [new_drug_allergy], "text": new_drug_allergy.get("display")})
+        drug_allergy.code = CodeableConcept(
+            {"coding": [new_drug_allergy], "text": new_drug_allergy.get("display")}
+        )
     if new_reaction:
-        drug_allergy.reaction = [AllergyIntoleranceReaction({
-            "manifestation": [{
-                "text": new_reaction.get("display"),
-                "coding": [new_reaction]
-            }]
-        })]
+        drug_allergy.reaction = [
+            AllergyIntoleranceReaction(
+                {
+                    "manifestation": [
+                        {"text": new_reaction.get("display"), "coding": [new_reaction]}
+                    ]
+                }
+            )
+        ]
 
     try:
         result = drug_allergy.create(smart.server)
@@ -848,11 +922,11 @@ def create_drug_allergy(patient_id):
             return jsonify({"result": "success", "fhir-response": result})
     except FHIRValidationError:
         # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
-        return jsonify({'error': 'bad request payload'})
+        return jsonify({"error": "bad request payload"})
     except HTTPError as e:
         print(e)
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
-        return jsonify({'error': 'something really bad has happened!'})
+        return jsonify({"error": "something really bad has happened!"})
 
 
 # start the app

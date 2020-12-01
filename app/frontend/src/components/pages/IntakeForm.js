@@ -8,15 +8,9 @@ import MedicalHistory from "../forms/MedicalHistory";
 const IntakeForm = ({ selectedPatientId }) => {
   return (
     <>
-      <PatientInfo
-        selectedPatientId={selectedPatientId}
-        handleSubmit={() => {}}
-      />
-      <MedicalHistory
-        selectedPatientId={selectedPatientId}
-        handleSubmit={() => {}}
-      />
-      <VisitPreparation patientData={{}} handleSubmit={() => {}} />
+      <PatientInfo selectedPatientId={selectedPatientId} />
+      <MedicalHistory selectedPatientId={selectedPatientId} />
+      <VisitPreparation patientData={{}} />
     </>
   );
 };

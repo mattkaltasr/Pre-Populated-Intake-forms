@@ -1,6 +1,6 @@
 .form-container {
   position: relative;
-  border: 1px solid rgba(0,0,0,0.25);
+  border: 1px solid rgba(0, 0, 0, 0.25);
   padding: 1em;
   border-radius: 0.28em;
   margin: 0 auto 2em auto;
@@ -12,7 +12,7 @@
 }
 
 .form-container:hover {
-  border: 1px solid rgba(0,0,0,0.33);
+  border: 1px solid rgba(0, 0, 0, 0.33);
 }
 
 .form-container.complete {

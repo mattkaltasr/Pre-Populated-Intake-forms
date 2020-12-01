@@ -4,14 +4,14 @@ import classnames from "classnames";
 
 import "./FormContainer.css";
 
-const FormContainer = ({ title, formComponents }) => {
+const FormContainer = ({ title, formComponents, complete }) => {
   const isError = false;
 
   return (
     <div
       className={classnames("flex flex-col form-container", {
         error: isError,
-        complete: false,
+        complete,
       })}
     >
       <span className="container-title">{title}</span>
@@ -23,6 +23,11 @@ const FormContainer = ({ title, formComponents }) => {
 FormContainer.propTypes = {
   title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
   formComponents: PropTypes.node.isRequired,
+  complete: PropTypes.bool,
+};
+
+FormContainer.defaultProps = {
+  complete: false,
 };
 
 export default FormContainer;
