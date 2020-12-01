@@ -78,9 +78,13 @@ Start your favorite web browser and navigate to:
     * Get Patient Personal Info by Patient Id
     `<BASE_URL>/api/patient/<id>`
     * Get Medications by Patient Id
-    `<BASE_URL>/api/medications/<id>`
+    `<BASE_URL>/api/home-med/<id>`
     * Get Conditions by Patient Id
     `<BASE_URL>/api/conditions/<id>`
+    * Get Procedures by Patient Id
+    `<BASE_URL>/api/procedure/<id>`
+    * Get Family Medical History by Patient Id
+    `<BASE_URL>/api/family_member_history/<patient_id`
     * Save (PUT) Patient Info
     `<BASE_URL>/api/patient/save`
         
@@ -118,7 +122,59 @@ Start your favorite web browser and navigate to:
                         "code": "22298006",
                         "display": "Myocardial Infarction"
                     }]
+    * Add (PUT) Procedures
+        `<BASE_URL>/api/procedure/<patient_id>`
+            
+        The endpoint expects a list of new procedures that need to be added to the patient
+            
+        Sample body json:
+                    
+                [
+                    {"code":"618007",
+                     "display":"Frontal sinusectomy",
+                     "date":"2020-11-12"},
+                     {"code":"2598006",
+                     "display":"Open Heart Surgery",
+                     "date":"2019-05-06"}
+                ]
 
+* Add (PUT) Family Medical History (Conditions)
+    `<BASE_URL>/api/procedure/<patient_id>`
+        
+    The endpoint expects a list of new family members with one or more conditions that need to be added to the patient
+        
+    Sample body json:
+                
+            [
+            
+              {
+                  "relationship" : "father",
+                  "condition": [{
+                          "code": "73211009",
+                          "display": "Diabetes",
+                          "system": "http://snomed.info/sct"
+                      },
+                       {
+                          "system": "http://snomed.info/sct",
+                          "code": "399068003",
+                          "display": "cancer"
+                      }]
+              },
+              {
+                  "relationship" : "sister",
+                  "condition": [{
+                          "code": "73211009",
+                          "display": "Diabetes",
+                          "system": "http://snomed.info/sct"
+                      },
+                       {
+                          "system": "http://snomed.info/sct",
+                          "code": "56265001",
+                          "display": "Heart disease"
+                      }]
+              }
+            
+            ]
   
     
     

@@ -564,7 +564,7 @@ def addConditionsForFamilyForPatient(patient_id):
 
 
 # TODO get surgical history
-@app.route("/api/Procedure/<id>", methods=["GET"])
+@app.route("/api/procedure/<id>", methods=["GET"])
 def getSurgicalHistoryForPatient(id):
     smart = _get_smart()
     """ Get procedure list by patient id
@@ -603,13 +603,39 @@ def getSurgicalHistoryForPatient(id):
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
         return jsonify({"error": "something really bad has happened!"})
 
-    # TODO post surgical history
-    # @app.route("/api/Procedure/<id>", methods==["PUT"])
-    # def update_SurgicalHistoryForPatient(id):
-    # TODO post surgical history
-    # needs to add in fields for this unsure of how
+@app.route("/api/procedure/<patient_id>", methods=["POST"])
+def addProceduresForPatient(patient_id):
+    smart = _get_smart()
+    new_procedures = request.json
 
-    # POST - Patient Info Update
+    # list of new_procedures to be added
+    result = []
+    for procedure_request in new_procedures:
+
+        new_procedure = Procedure()
+
+        coding_procedure = {
+            "system": "http://snomed.info/sct",
+            "display": procedure_request.get("display"),
+            "code": procedure_request.get("code"), #TODO add a mapped code
+        }
+        new_procedure.code = CodeableConcept(
+            {"text": procedure_request.get("display"), "coding": [coding_procedure]}
+        )
+        new_procedure.subject = FHIRReference(
+            {"reference": f"Patient/{patient_id}"}
+        )
+        new_procedure.status = "completed"
+        new_procedure.performedDateTime = FHIRDate(procedure_request.get('date'))
+
+        status = new_procedure.create(server=smart.server)
+        if status:
+            result.append({"result": "success", "fhir-response": status})
+            #print(result)
+
+    return jsonify(result)
+
+# POST - Patient Info Update
 @app.route("/api/patient/save", methods=["PUT"])
 def updatePatient():
     smart = _get_smart()
