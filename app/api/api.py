@@ -440,7 +440,7 @@ def get_family_member_history_for_patient(id):
     Get Family Member History Observations by patient id
     """
 
-    # 1e19bb7a-d990-4924-9fae-be84f19c53c1
+
     try:
         results = []
         p_search = FamilyMemberHistory.where(struct={'patient': "Patient/" + str(id)})
