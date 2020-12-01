@@ -61,6 +61,16 @@ const MedicalHistory = ({ selectedPatientId }) => {
   const [patientAnswersSurgical, setAnswersSurgical] = React.useState({});
   const [patientDataSurgical, setPatientDataSurgical] = React.useState({});
 
+  const [
+    patientAnswersMedicationAllergies,
+    setAnswersMedicationAllergies,
+  ] = React.useState({});
+
+  const [
+    patientDataMedicationAllergies,
+    setPatientDataMedicationAllergies,
+  ] = React.useState({});
+
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
 
@@ -106,6 +116,26 @@ const MedicalHistory = ({ selectedPatientId }) => {
             setPatientDataMedications({
               ...patientDataMedications,
               medications: result,
+            });
+          }
+        },
+      });
+
+      loadPatientInfoById({
+        patientId: selectedPatientId,
+        endpoint: "drug-allergy",
+        setLoading,
+        setData: (data) => {
+          const result = data || [];
+
+          if (result) {
+            setAnswersMedicationAllergies({
+              ...patientAnswersMedicationAllergies,
+              allergies: result,
+            });
+            setPatientDataMedicationAllergies({
+              ...patientDataMedicationAllergies,
+              allergies: result,
             });
           }
         },
