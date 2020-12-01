@@ -18,6 +18,7 @@ const TableRow = ({ header, rowData, onChange, asCheckbox }) => {
               <Checkbox
                 style={{ flex: 1, margin: "0", borderRadius: 0 }}
                 onChange={() => onChange(r.field)}
+                checked={r.value}
               />
             ) : (
               <input

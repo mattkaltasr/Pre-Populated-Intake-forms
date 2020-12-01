@@ -28,7 +28,10 @@ from fhirclient.models.codeableconcept import CodeableConcept
 from fhirclient.models.fhirsearch import FHIRSearchParam
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.observation import Observation
-from fhirclient.models.familymemberhistory import FamilyMemberHistory, FamilyMemberHistoryCondition
+from fhirclient.models.familymemberhistory import (
+    FamilyMemberHistory,
+    FamilyMemberHistoryCondition,
+)
 
 from requests.exceptions import HTTPError
 from datetime import datetime
@@ -66,12 +69,7 @@ conditions_list = {
     "14304000": "Disorder of thyroid gland (disorder)",
     "56717001": "Tuberculosis (disorder)",
 }
-family_member = {
-    "father" : "FTH",
-    "mother" : "MTH",
-    "brother" : "BRO",
-    "sister" : "SIS"
-}
+family_member = {"father": "FTH", "mother": "MTH", "brother": "BRO", "sister": "SIS"}
 # Flask app setup
 app = Flask(__name__)
 from flask_cors import CORS
@@ -512,52 +510,58 @@ def get_family_member_history_for_patient(id):
         )
     except HTTPError:
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
-<<<<<<< HEAD
         return jsonify({"error": "something really bad has happened!"})
-=======
-        return jsonify({'error': 'something really bad has happened!'})
 
-#POST Family Medical History
+
+# POST Family Medical History
 @app.route("/api/family_member_history/<patient_id>", methods=["POST"])
 def addConditionsForFamilyForPatient(patient_id):
     smart = _get_smart()
-    #p_search = FamilyMemberHistory.where({"subject": f"Patient/{patient_id}"})
-    #p_familymembers_history = p_search.perform_resources(smart.server)
+    # p_search = FamilyMemberHistory.where({"subject": f"Patient/{patient_id}"})
+    # p_familymembers_history = p_search.perform_resources(smart.server)
     new_familymember_history = request.json
 
-    #for each family family_member add condition(s)
-    result=[]
+    # for each family family_member add condition(s)
+    result = []
     for history in new_familymember_history:
 
         familymemberhistory = FamilyMemberHistory()
 
-        coding_relationship={"system":"http://hl7.org/fhir/v3/RoleCode","display":history.get('relationship'),"code":family_member.get(history.get('relationship'))}
+        coding_relationship = {
+            "system": "http://hl7.org/fhir/v3/RoleCode",
+            "display": history.get("relationship"),
+            "code": family_member.get(history.get("relationship")),
+        }
         familymemberhistory.relationship = CodeableConcept(
-            {"text": history.get('relationship'), "coding": [coding_relationship]}
+            {"text": history.get("relationship"), "coding": [coding_relationship]}
         )
 
-        familymemberhistory.patient = FHIRReference({"reference": f"Patient/{patient_id}"})
+        familymemberhistory.patient = FHIRReference(
+            {"reference": f"Patient/{patient_id}"}
+        )
         familymemberhistory.status = "completed"
         new_conditions = []
-        #familymemberhistory.condition = []
-        #print(familymemberhistory)
-        for cond in history.get('condition'):
-            #one family family_member can have multiple conditions
-            coding_cond={"system":"http://snomed.info/sct","display":cond.get('display'),"code":cond.get('code')}
+        # familymemberhistory.condition = []
+        # print(familymemberhistory)
+        for cond in history.get("condition"):
+            # one family family_member can have multiple conditions
+            coding_cond = {
+                "system": "http://snomed.info/sct",
+                "display": cond.get("display"),
+                "code": cond.get("code"),
+            }
             familycondition = FamilyMemberHistoryCondition()
             familycondition.code = CodeableConcept(
-                {"text": cond.get('display'), "coding": [coding_cond]}
+                {"text": cond.get("display"), "coding": [coding_cond]}
             )
             new_conditions.append(familycondition)
         familymemberhistory.condition = new_conditions
         status = familymemberhistory.create(server=smart.server)
         if status:
             result.append({"result": "success", "fhir-response": status})
-            #print(result)
-
+            # print(result)
 
     return jsonify(result)
->>>>>>> master
 
 
 # TODO get surgical history
@@ -602,8 +606,8 @@ def getSurgicalHistoryForPatient(id):
 
 
 # TODO post surgical history
-#@app.route("/api/Procedure/<id>", methods==["PUT"])
-#def update_SurgicalHistoryForPatient(id):
+# @app.route("/api/Procedure/<id>", methods==["PUT"])
+# def update_SurgicalHistoryForPatient(id):
 # TODO post surgical history
 # needs to add in fields for this unsure of how
 

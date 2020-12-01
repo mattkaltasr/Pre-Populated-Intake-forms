@@ -1,4 +1,6 @@
 import React from "react";
+import _ from "lodash";
+
 import TableRow from "./TableRow";
 
 const HeaderCell = ({ title }) => (
@@ -16,7 +18,12 @@ const HeaderCell = ({ title }) => (
   </div>
 );
 
-const FamilyMedicalHistory = () => {
+const FamilyMedicalHistory = ({ medicalHistory }) => {
+  const byFamilyMember = _.groupBy(medicalHistory, (m) =>
+    _.get(m.brief, "relationship")
+  );
+
+  console.log(byFamilyMember);
   return (
     <div className="flex flex-col">
       <strong style={{ flex: 1, fontSize: "0.85em", marginBottom: "0.5em" }}>
@@ -30,86 +37,58 @@ const FamilyMedicalHistory = () => {
         <HeaderCell title="Sister" />
       </div>
       <div>
-        <div className="flex" style={{ flex: 1 }}>
-          <TableRow
-            onChange={() => {}}
-            header={
-              <div
-                className="flex"
-                style={{ flex: 1, border: "1px solid black" }}
-              >
-                <span
-                  style={{ flex: 0.25, margin: "auto", fontSize: "0.85em" }}
-                >
-                  Cancer
-                </span>
-              </div>
-            }
-            asCheckbox
-            rowData={[
-              { field: "mother", value: "" },
-              { field: "father", value: "" },
-              { field: "brother", value: "" },
-              { field: "sister", value: "" },
-            ]}
-          />
-        </div>
-        <div className="flex" style={{ flex: 1 }}>
-          <TableRow
-            onChange={() => {}}
-            header={
-              <div
-                className="flex"
-                style={{ flex: 1, border: "1px solid black" }}
-              >
-                <span
-                  style={{ flex: 0.25, margin: "auto", fontSize: "0.85em" }}
-                >
-                  Diabetes
-                </span>
-              </div>
-            }
-            asCheckbox
-            rowData={[
-              { field: "mother", value: "" },
-              { field: "father", value: "" },
-              { field: "brother", value: "" },
-              { field: "sister", value: "" },
-            ]}
-          />
-        </div>
-        <div className="flex" style={{ flex: 1 }}>
-          <TableRow
-            onChange={() => {}}
-            header={
-              <div
-                className="flex"
-                style={{
-                  flex: 1,
-                  border: "1px solid black",
-                }}
-              >
-                <span
-                  style={{
-                    flex: 0.25,
-                    margin: "auto",
-                    fontSize: "0.85em",
-                    whiteSpace: "pre",
-                  }}
-                >
-                  Heart Disease
-                </span>
-              </div>
-            }
-            asCheckbox
-            rowData={[
-              { field: "mother", value: "" },
-              { field: "father", value: "" },
-              { field: "brother", value: "" },
-              { field: "sister", value: "" },
-            ]}
-          />
-        </div>
+        {[
+          { display: "Cancer", code: "395099008" },
+          { display: "Diabetes", code: "73211009" },
+          { display: "Heart Disease", code: "78941-2" },
+        ].map((m) => {
+          return (
+            <div className="flex" style={{ flex: 1 }} key={m.display}>
+              <TableRow
+                onChange={() => {}}
+                header={
+                  <div
+                    className="flex"
+                    style={{ flex: 1, border: "1px solid black" }}
+                  >
+                    <span
+                      style={{ flex: 0.25, margin: "auto", fontSize: "0.85em" }}
+                    >
+                      {m.display}
+                    </span>
+                  </div>
+                }
+                asCheckbox
+                rowData={[
+                  {
+                    field: "mother",
+                    value: !!(byFamilyMember.mother || []).find(
+                      (d) => d.details.code === m.code
+                    ),
+                  },
+                  {
+                    field: "father",
+                    value: !!(byFamilyMember.father || []).find(
+                      (d) => d.details.code === m.code
+                    ),
+                  },
+                  {
+                    field: "brother",
+                    value: !!(byFamilyMember.brother || []).find(
+                      (d) => d.details.code === m.code
+                    ),
+                  },
+                  {
+                    field: "sister",
+                    value: !!(byFamilyMember.sister || []).find(
+                      (d) => d.details.code === m.code
+                    ),
+                  },
+                ]}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

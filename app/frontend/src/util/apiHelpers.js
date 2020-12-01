@@ -1,4 +1,4 @@
-const DEV_MODE = false;
+const DEV_MODE = true;
 
 const BASE_URL = DEV_MODE
   ? "http://127.0.0.1:8086/api"

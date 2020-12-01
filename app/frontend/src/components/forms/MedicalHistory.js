@@ -71,6 +71,15 @@ const MedicalHistory = ({ selectedPatientId }) => {
     setPatientDataMedicationAllergies,
   ] = React.useState({});
 
+  const [
+    patientAnswersFamMedicalHistory,
+    setAnswersFamMedicalHistory,
+  ] = React.useState({});
+  const [
+    patientDataFamMedicalHistory,
+    setPatientDataFamMedicalHistory,
+  ] = React.useState({});
+
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
 
@@ -136,6 +145,26 @@ const MedicalHistory = ({ selectedPatientId }) => {
             setPatientDataMedicationAllergies({
               ...patientDataMedicationAllergies,
               allergies: result,
+            });
+          }
+        },
+      });
+
+      loadPatientInfoById({
+        patientId: selectedPatientId,
+        endpoint: "family_member_history",
+        setLoading,
+        setData: (data) => {
+          const result = data || [];
+
+          if (result) {
+            setAnswersFamMedicalHistory({
+              ...patientAnswersFamMedicalHistory,
+              familyMedicalHistory: result,
+            });
+            setPatientDataFamMedicalHistory({
+              ...patientDataFamMedicalHistory,
+              familyMedicalHistory: result,
             });
           }
         },
@@ -284,7 +313,11 @@ const MedicalHistory = ({ selectedPatientId }) => {
               />
             </div>
             <HealthHabits />
-            <FamilyMedicalHistory />
+            <FamilyMedicalHistory
+              medicalHistory={
+                patientAnswersFamMedicalHistory.familyMedicalHistory || []
+              }
+            />
           </div>
           <Button
             style={{ margin: "1em auto auto 0", width: "10em" }}
