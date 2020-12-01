@@ -433,9 +433,8 @@ def getHealthHabitsForPatient(id):
         return jsonify({"error": "something really bad has happened!"})
 
 
-# TODO Get Family Medical History
-# requires "api_base": "https://hapi.fhir.org/baseDstu3",
-# patient id:  2743900
+# Get Family Medical History
+# test patient 40f680c8-238b-426b-b1c0-1649c780ce69
 # returns a prostate cancer history item
 @app.route('/api/family_member_history/<id>', methods=['GET'])
 def get_family_member_history_for_patient(id):
@@ -530,6 +529,7 @@ def addConditionsForFamilyForPatient(patient_id):
 
 
     return jsonify(result)
+
 
 # TODO get surgical history
 @app.route("/api/Procedure/<id>", methods=["GET"])
