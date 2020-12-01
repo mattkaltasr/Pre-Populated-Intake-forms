@@ -64,11 +64,11 @@ const Medications = ({ setMedicationValue, patientMedications }) => {
               />
               <Cell
                 onChange={(val) => setMedicationValue(idx, "dosage", val)}
-                value={dosage !== undefined?dosage.value +" "+dosage.unit:""}
+                value={dosage !== undefined?dosage.value:""}
               />
               <Cell
                 onChange={(val) => setMedicationValue(idx, "frequency", val)}
-                value={frequency !== undefined?frequency.frequency + " "+ frequency.period +" "+ frequency.periodUnit:""}
+                value={frequency !== undefined?frequency.frequency:""}
               />
             </div>
           );
