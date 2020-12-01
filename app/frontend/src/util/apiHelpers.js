@@ -69,10 +69,18 @@ export const savePatientData = ({
   data,
   endpoint = "patient/save",
   method = "PUT",
+  asArray = false,
 }) => {
+  let payload = null;
+  if (asArray) {
+    payload = data;
+  } else {
+    payload = { ...data, id: patientId };
+  }
+
   fetch(`${BASE_URL}/${endpoint}`, {
     method,
-    body: JSON.stringify({ ...data, id: patientId }),
+    body: JSON.stringify(payload),
     headers: new Headers({
       "content-type": "application/json",
     }),

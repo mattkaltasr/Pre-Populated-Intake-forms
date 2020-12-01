@@ -32,6 +32,7 @@ const FamilyMedicalHistory = () => {
       <div>
         <div className="flex" style={{ flex: 1 }}>
           <TableRow
+            onChange={() => {}}
             header={
               <div
                 className="flex"
@@ -55,6 +56,7 @@ const FamilyMedicalHistory = () => {
         </div>
         <div className="flex" style={{ flex: 1 }}>
           <TableRow
+            onChange={() => {}}
             header={
               <div
                 className="flex"
@@ -78,6 +80,7 @@ const FamilyMedicalHistory = () => {
         </div>
         <div className="flex" style={{ flex: 1 }}>
           <TableRow
+            onChange={() => {}}
             header={
               <div
                 className="flex"

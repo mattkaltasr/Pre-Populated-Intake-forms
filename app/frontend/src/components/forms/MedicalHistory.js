@@ -1,15 +1,17 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 
 import FormContainer from "../containers/FormContainer";
 import Checkbox from "../formElements/Checkbox";
-import { loadPatientInfoById } from "../../util/apiHelpers";
+import { loadPatientInfoById, savePatientData } from "../../util/apiHelpers";
 import Medications from "./MedicalHistory/Medications";
 import SurgicalHistory from "./MedicalHistory/SurgicalHistory";
 import MedicationAllergies from "./MedicalHistory/MedicationAllergies";
 import HealthHabits from "./MedicalHistory/HealthHabits";
 import FamilyMedicalHistory from "./MedicalHistory/FamilyMedicalHistory";
+import Button from "../formElements/Button";
 
 const conditions = [
   { display: "Anxiety", code: "48694002" },
@@ -29,7 +31,7 @@ const conditions = [
   { display: "Sore Throat", code: "43878008" },
 ];
 
-const codeToCondition = _.keyBy(conditions, (c) => c.code);
+const conditionByCode = _.keyBy(conditions, (c) => c.code);
 
 /** these should probably be stowed away in a
  *  css class, but that would require wiring up
@@ -59,11 +61,25 @@ const MedicalHistory = ({ selectedPatientId }) => {
   const [patientAnswersSurgical, setAnswersSurgical] = React.useState({});
   const [patientDataSurgical, setPatientDataSurgical] = React.useState({});
 
+  const [
+    patientAnswersMedicationAllergies,
+    setAnswersMedicationAllergies,
+  ] = React.useState({});
+
+  const [
+    patientDataMedicationAllergies,
+    setPatientDataMedicationAllergies,
+  ] = React.useState({});
+
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [isLoading, setLoading] = React.useState(false);
+
   React.useEffect(() => {
     if (selectedPatientId) {
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "conditions",
+        setLoading,
         setData: (data) => {
           const result = data || [];
 
@@ -88,6 +104,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "medications",
+        setLoading,
         setData: (data) => {
           const result = data || [];
 
@@ -106,7 +123,28 @@ const MedicalHistory = ({ selectedPatientId }) => {
 
       loadPatientInfoById({
         patientId: selectedPatientId,
+        endpoint: "drug-allergy",
+        setLoading,
+        setData: (data) => {
+          const result = data || [];
+
+          if (result) {
+            setAnswersMedicationAllergies({
+              ...patientAnswersMedicationAllergies,
+              allergies: result,
+            });
+            setPatientDataMedicationAllergies({
+              ...patientDataMedicationAllergies,
+              allergies: result,
+            });
+          }
+        },
+      });
+
+      loadPatientInfoById({
+        patientId: selectedPatientId,
         endpoint: "healthhabits",
+        setLoading,
         setData: (data) => {
           const result = data || [];
           // console.log("healthhabits: ", data);
@@ -128,6 +166,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "Procedure",
+        setLoading,
         setData: (data) => {
           const result = data || [];
 
@@ -147,7 +186,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPatientId]);
 
-  const setConditionValue = (key, value) =>
+  const setConditionValue = (key, value) => {
     setAnswersConditions({
       ...patientAnswersConditions,
       conditions: {
@@ -155,8 +194,10 @@ const MedicalHistory = ({ selectedPatientId }) => {
         [key]: value,
       },
     });
+    setIsSubmitted(false);
+  };
 
-  const setSurgicalValue = (key, value) =>
+  const setSurgicalValue = (key, value) => {
     setAnswersSurgical({
       ...patientAnswersSurgical,
       surgical: {
@@ -164,6 +205,8 @@ const MedicalHistory = ({ selectedPatientId }) => {
         [key]: value,
       },
     });
+    setIsSubmitted(false);
+  };
 
   /** edit a specific medication's field in array */
   const setMedicationValue = (medicationIndex, key, value) =>
@@ -186,65 +229,95 @@ const MedicalHistory = ({ selectedPatientId }) => {
         ),
     });
 
-  // console.log(
-  //   "patientData",
-  //   patientAnswersMedications,
-  //   patientAnswersConditions
-  // );
-
   return (
     <FormContainer
       title="Medical History"
       formComponents={
-        <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
-          <div className="flex flex-col" style={{ marginBottom: "0.5em" }}>
-            <span style={{ fontSize: "0.8em", marginBottom: "0.5em" }}>
-              (Please check or list any medical problems you have experienced)
-            </span>
+        <div className="flex flex-col">
+          <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
+            <div className="flex flex-col" style={{ marginBottom: "0.5em" }}>
+              <span style={{ fontSize: "0.8em", marginBottom: "0.5em" }}>
+                (Please check or list any medical problems you have experienced)
+              </span>
+              <div
+                className="flex"
+                style={{
+                  flexWrap: "wrap",
+                  width: "100%",
+                  margin: "0 auto 0 auto",
+                }}
+              >
+                {conditions.map((r) => {
+                  const value = _.get(
+                    patientAnswersConditions.conditions,
+                    r.code,
+                    false // default to not selected
+                  );
+
+                  return (
+                    <Checkbox
+                      key={r.code}
+                      title={r.display}
+                      checked={!!value}
+                      onChange={() => setConditionValue(r.code, !value)}
+                      style={{ ...checkboxStyle }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+            <Medications
+              setMedicationValue={setMedicationValue}
+              patientMedications={_.get(
+                patientAnswersMedications,
+                "medications",
+                []
+              )}
+            />
             <div
               className="flex"
-              style={{
-                flexWrap: "wrap",
-                width: "100%",
-                margin: "0 auto 0 auto",
-              }}
+              style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
             >
-              {conditions.map((r) => {
-                const value = _.get(
-                  patientAnswersConditions.conditions,
-                  r.code,
-                  false // default to not selected
-                );
-
-                return (
-                  <Checkbox
-                    key={r.code}
-                    title={r.display}
-                    checked={!!value}
-                    onChange={() => setConditionValue(r.code, !value)}
-                    style={{ ...checkboxStyle }}
-                  />
-                );
-              })}
+              <MedicationAllergies />
+              <SurgicalHistory
+                patientAnswersSurgical={patientAnswersSurgical}
+              />
             </div>
+            <HealthHabits />
+            <FamilyMedicalHistory />
           </div>
-          <Medications
-            setMedicationValue={setMedicationValue}
-            patientMedications={_.get(
-              patientAnswersMedications,
-              "medications",
-              []
-            )}
+          <Button
+            style={{ margin: "1em auto auto 0", width: "10em" }}
+            text={isSubmitted ? "Saved" : "Submit"}
+            disabled={isLoading || isSubmitted}
+            onClick={() => {
+              setLoading(true);
+              /**
+               * first update conditions
+               */
+              const conditionPayload = Object.keys(
+                patientAnswersConditions.conditions
+              )
+                .filter(
+                  (k) =>
+                    patientAnswersConditions.conditions[k] && conditionByCode[k]
+                )
+                .map((code) => ({
+                  code,
+                  display: conditionByCode[code].display,
+                }));
+
+              savePatientData({
+                endpoint: `conditions/${selectedPatientId}`,
+                patientId: selectedPatientId,
+                asArray: true,
+                data: conditionPayload,
+              });
+
+              setLoading(false);
+              setIsSubmitted(true);
+            }}
           />
-          <div
-            className="flex"
-            style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
-          >
-            <MedicationAllergies />
-            <SurgicalHistory patientAnswersSurgical={patientAnswersSurgical} />
-          </div>
-          <HealthHabits />
-          <FamilyMedicalHistory />
         </div>
       }
     />
