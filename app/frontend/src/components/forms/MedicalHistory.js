@@ -1,15 +1,17 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 
 import FormContainer from "../containers/FormContainer";
 import Checkbox from "../formElements/Checkbox";
-import { loadPatientInfoById } from "../../util/apiHelpers";
+import { loadPatientInfoById, savePatientData } from "../../util/apiHelpers";
 import Medications from "./MedicalHistory/Medications";
 import SurgicalHistory from "./MedicalHistory/SurgicalHistory";
 import MedicationAllergies from "./MedicalHistory/MedicationAllergies";
 import HealthHabits from "./MedicalHistory/HealthHabits";
 import FamilyMedicalHistory from "./MedicalHistory/FamilyMedicalHistory";
+import Button from "../formElements/Button";
 
 const conditions = [
   { display: "Anxiety", code: "48694002" },
@@ -28,8 +30,6 @@ const conditions = [
   { display: "Tuberculosis", code: "56717001" },
   { display: "Sore Throat", code: "43878008" },
 ];
-
-const codeToCondition = _.keyBy(conditions, (c) => c.code);
 
 /** these should probably be stowed away in a
  *  css class, but that would require wiring up
@@ -186,65 +186,89 @@ const MedicalHistory = ({ selectedPatientId }) => {
         ),
     });
 
-  // console.log(
-  //   "patientData",
-  //   patientAnswersMedications,
-  //   patientAnswersConditions
-  // );
-
   return (
     <FormContainer
       title="Medical History"
       formComponents={
-        <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
-          <div className="flex flex-col" style={{ marginBottom: "0.5em" }}>
-            <span style={{ fontSize: "0.8em", marginBottom: "0.5em" }}>
-              (Please check or list any medical problems you have experienced)
-            </span>
+        <div className="flex flex-col">
+          <div className="flex flex-col" style={{ flex: 1, flexWrap: "wrap" }}>
+            <div className="flex flex-col" style={{ marginBottom: "0.5em" }}>
+              <span style={{ fontSize: "0.8em", marginBottom: "0.5em" }}>
+                (Please check or list any medical problems you have experienced)
+              </span>
+              <div
+                className="flex"
+                style={{
+                  flexWrap: "wrap",
+                  width: "100%",
+                  margin: "0 auto 0 auto",
+                }}
+              >
+                {conditions.map((r) => {
+                  const value = _.get(
+                    patientAnswersConditions.conditions,
+                    r.code,
+                    false // default to not selected
+                  );
+
+                  return (
+                    <Checkbox
+                      key={r.code}
+                      title={r.display}
+                      checked={!!value}
+                      onChange={() => setConditionValue(r.code, !value)}
+                      style={{ ...checkboxStyle }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+            <Medications
+              setMedicationValue={setMedicationValue}
+              patientMedications={_.get(
+                patientAnswersMedications,
+                "medications",
+                []
+              )}
+            />
             <div
               className="flex"
-              style={{
-                flexWrap: "wrap",
-                width: "100%",
-                margin: "0 auto 0 auto",
-              }}
+              style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
             >
-              {conditions.map((r) => {
-                const value = _.get(
-                  patientAnswersConditions.conditions,
-                  r.code,
-                  false // default to not selected
-                );
-
-                return (
-                  <Checkbox
-                    key={r.code}
-                    title={r.display}
-                    checked={!!value}
-                    onChange={() => setConditionValue(r.code, !value)}
-                    style={{ ...checkboxStyle }}
-                  />
-                );
-              })}
+              <MedicationAllergies />
+              <SurgicalHistory
+                patientAnswersSurgical={patientAnswersSurgical}
+              />
             </div>
+            <HealthHabits />
+            <FamilyMedicalHistory />
           </div>
-          <Medications
-            setMedicationValue={setMedicationValue}
-            patientMedications={_.get(
-              patientAnswersMedications,
-              "medications",
-              []
-            )}
+          <Button
+            style={{ margin: "1em auto auto 0", width: "10em" }}
+            // text={isSubmitted ? "Saved" : "Submit"}
+            // disabled={isLoading || isSubmitted}
+            onClick={() => {
+              // setLoading(true);
+              // /**
+              //  * BAD: should only submit fields that have actually changed here,
+              //  * rather than every possible field
+              //  *
+              //  */
+              // savePatientData({
+              //   patientId: selectedPatientId,
+              //   data: {
+              //   },
+              // });
+              // /**
+              //  * this is a really, really bad pattern. We are assuming that the answers
+              //  * submitted by the patient are completely valid and that there are no
+              //  * errors in the backend. But, in the interest of time ...
+              //  */
+              // setPatientData({ ...patientData, ...patientAnswers });
+              // setLoading(false);
+              // setIsSubmitted(true);
+            }}
           />
-          <div
-            className="flex"
-            style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
-          >
-            <MedicationAllergies />
-            <SurgicalHistory patientAnswersSurgical={patientAnswersSurgical} />
-          </div>
-          <HealthHabits />
-          <FamilyMedicalHistory />
         </div>
       }
     />

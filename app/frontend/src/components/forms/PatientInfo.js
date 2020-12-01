@@ -1,5 +1,5 @@
+/* eslint-disable react/prop-types */
 import React from "react";
-import PropTypes from "prop-types";
 
 import FormContainer from "../containers/FormContainer";
 import TextInput from "../formElements/TextInput";
@@ -13,8 +13,8 @@ const PatientInfo = ({ selectedPatientId }) => {
   const [patientAnswers, setAnswers] = React.useState({}); // hold patient/user responses
   const [patientData, setPatientData] = React.useState({}); // "immutable" copy of fhir data
 
-  const [error, setError] = React.useState(null);
   const [isLoading, setLoading] = React.useState(false);
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   React.useEffect(() => {
     if (selectedPatientId) {
@@ -27,14 +27,17 @@ const PatientInfo = ({ selectedPatientId }) => {
             setPatientData({ ...result }); // shallow copy
           }
         },
-        setError,
         setLoading,
       });
     }
   }, [selectedPatientId]);
 
-  const setFieldValue = (key, value) =>
+  const setFieldValue = (key, value) => {
     setAnswers({ ...patientAnswers, [key]: value });
+    setIsSubmitted(false);
+  };
+
+  console.log("patientData", patientData);
 
   return (
     <FormContainer
@@ -205,11 +208,12 @@ const PatientInfo = ({ selectedPatientId }) => {
             </div>
           </div>
           <Button
-            style={{ margin: "auto 0 auto auto", width: "10em" }}
-            title="Save"
-            disabled={isLoading}
+            style={{ margin: "1em auto auto 0", width: "10em" }}
+            text={isSubmitted ? "Saved" : "Submit"}
+            disabled={isLoading || isSubmitted}
             onClick={() => {
               setLoading(true);
+
               /**
                * BAD: should only submit fields that have actually changed here,
                * rather than every possible field
@@ -237,16 +241,13 @@ const PatientInfo = ({ selectedPatientId }) => {
                */
               setPatientData({ ...patientData, ...patientAnswers });
               setLoading(false);
+              setIsSubmitted(true);
             }}
           />
         </div>
       }
     />
   );
-};
-
-PatientInfo.propTypes = {
-  selectedPatientId: PropTypes.string.isRequired,
 };
 
 export default PatientInfo;
