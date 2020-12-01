@@ -33,6 +33,7 @@ from fhirclient.models.familymemberhistory import (
     FamilyMemberHistoryCondition,
 )
 
+
 from requests.exceptions import HTTPError
 from datetime import datetime
 
@@ -448,72 +449,61 @@ def getHealthHabitsForPatient(id):
         return jsonify({"error": "something really bad has happened!"})
 
 
+
 # Get Family Medical History
-# test patient 40f680c8-238b-426b-b1c0-1649c780ce69
-# returns a prostate cancer history item
-@app.route("/api/family_member_history/<id>", methods=["GET"])
+# BEST PATIENT:40f680c8-238b-426b-b1c0-1649c780ce69
+# MFSB all with diabetes
+# + 2 heart disease, 1 cancer, 1 asthma
+# 1e19bb7a-d990-4924-9fae-be84f19c53c1:    Mother and father with hypertension
+
+@app.route('/api/family_member_history/<id>', methods=['GET'])
 def get_family_member_history_for_patient(id):
     smart = _get_smart()
     """
     Get Family Member History Observations by patient id
     """
-
     try:
         results = []
         p_search = FamilyMemberHistory.where(struct={"patient": "Patient/" + str(id)})
+
         p_history = p_search.perform_resources(smart.server)
         print(id)
         print(len(p_history))
 
         for hist in p_history:
-            brief_display = ""
-            relationship = ""
-            if hist.relationship:
-                relationship = hist.relationship.coding[0].display.lower()
-            code = ""
-            display = ""
-            hist_id = ""
-            system = ""
-            if hist.condition:
-                code = hist.condition[0].code.coding[0].code
-                display = hist.condition[0].code.coding[0].display
-                system = hist.condition[0].code.coding[0].system
-            if hist.id:
-                hist_id = hist.id
-            if relationship not in ["mother", "father", "sister", "brother"]:
-                relationship = ""
+            for i in range(len(hist.condition)):
+                relationship = ''
+                if hist.relationship:
+                    relationship = hist.relationship.coding[0].display.lower()
+                code = ''
+                display = ''
+                hist_id = ''
+                system = ''
+                if hist.condition:
+                    code = hist.condition[i].code.coding[0].code
+                    display = hist.condition[i].code.coding[0].display
+                    system = hist.condition[i].code.coding[0].system
+                if hist.id:
+                    hist_id = hist.id
+                if relationship not in ['mother', 'father', 'sister', 'brother']:
+                    relationship = ''
 
-            for form_condition in ["cancer", "heart", "diabetes"]:
-                if "cancer" in form_condition:
-                    brief_display = form_condition
-
-            if relationship != "" and brief_display != "":
-                brief = {"brief_display": brief_display, "relationship": relationship}
-                details = {
-                    "code": code,
-                    "display": display,
-                    "id": hist_id,
-                    "system": system,
-                }
-                results.append({"brief": brief, "details": details})
+                details = {"code": code, "display": display, "id": hist_id, "system": system}
+                results.append({"condition": details, "relationship": relationship})
 
         # results.sort(key=lambda m: m.get("display"))
         return jsonify(results)
 
     except FHIRValidationError:
         # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
-        return jsonify(
-            {
-                "error": "sorry, we' querying a public server and someone must have entered something \
-                                            not valid there"
-            }
-        )
+        return jsonify({'error': 'sorry, we\' querying a public server and someone must have entered something \
+                                            not valid there'})
     except HTTPError:
         # Same as the error handler above. This is a bad pattern. Should return a HTTP 5xx error instead.
-        return jsonify({"error": "something really bad has happened!"})
+        return jsonify({'error': 'something really bad has happened!'})
 
 
-# POST Family Medical History
+#POST Family Medical History
 @app.route("/api/family_member_history/<patient_id>", methods=["POST"])
 def addConditionsForFamilyForPatient(patient_id):
     smart = _get_smart()
@@ -562,7 +552,10 @@ def addConditionsForFamilyForPatient(patient_id):
             # print(result)
 
     return jsonify(result)
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 
 # TODO get surgical history
 @app.route("/api/Procedure/<id>", methods=["GET"])
@@ -613,8 +606,8 @@ def getSurgicalHistoryForPatient(id):
 
 
 # POST - Patient Info Update
-@app.route("/api/patient/save", methods=["PUT"])
-def updatePatient():
+# @app.route("/api/patient/save", methods=["PUT"])
+# def updatePatient():
     smart = _get_smart()
     try:
         # prep patient info

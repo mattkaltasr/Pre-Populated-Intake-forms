@@ -112,7 +112,7 @@ const MedicalHistory = ({ selectedPatientId }) => {
 
       loadPatientInfoById({
         patientId: selectedPatientId,
-        endpoint: "medications",
+        endpoint: "home-med",
         setLoading,
         setData: (data) => {
           const result = data || [];
