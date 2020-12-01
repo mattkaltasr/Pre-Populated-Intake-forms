@@ -139,7 +139,7 @@ Start your favorite web browser and navigate to:
                 ]
 
 * Add (PUT) Family Medical History (Conditions)
-    `<BASE_URL>/api/procedure/<patient_id>`
+    `<BASE_URL>/api/family_member_history/<patient_id>`
         
     The endpoint expects a list of new family members with one or more conditions that need to be added to the patient
         
