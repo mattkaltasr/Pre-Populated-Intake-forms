@@ -56,19 +56,19 @@ const Medications = ({ setMedicationValue, patientMedications }) => {
             <div className="flex medical-row" key={key}>
               <Cell
                 onChange={(val) => setMedicationValue(idx, "medication", val)}
-                value={medication}
+                value={medication !== undefined && medication.display !== undefined?medication.display:""}
               />
               <Cell
                 onChange={(val) => setMedicationValue(idx, "condition", val)}
-                value={condition}
+                value={condition !== undefined && condition.display !== undefined?condition.display:""}
               />
               <Cell
                 onChange={(val) => setMedicationValue(idx, "dosage", val)}
-                value={dosage}
+                value={dosage !== undefined?dosage.value +" "+dosage.unit:""}
               />
               <Cell
                 onChange={(val) => setMedicationValue(idx, "frequency", val)}
-                value={frequency}
+                value={frequency !== undefined?frequency.frequency + " "+ frequency.period +" "+ frequency.periodUnit:""}
               />
             </div>
           );
