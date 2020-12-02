@@ -545,6 +545,8 @@ def addConditionsForFamilyForPatient(patient_id):
     new_familymember_history = request.json
 
     # for each family family_member add condition(s)
+    #ested with local unit test
+
     result = []
     for history in new_familymember_history:
 
@@ -593,6 +595,7 @@ def getSurgicalHistoryForPatient(id):
     smart = _get_smart()
     """ Get procedure list by patient id
     """
+    #  used for paper
     # 1e19bb7a-d990-4924-9fae-be84f19c53c1
     try:
         results = []
