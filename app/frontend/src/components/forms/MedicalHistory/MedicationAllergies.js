@@ -1,13 +1,11 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
 import React from "react";
-
 import _ from "lodash";
+
 import TableRow from "./TableRow";
 
 const MedicationAllergies = ({ medicationAllergies }) => {
-  console.log(medicationAllergies);
-
   const sliced = medicationAllergies.slice(
     Math.max(medicationAllergies.length - 3, 0)
   );

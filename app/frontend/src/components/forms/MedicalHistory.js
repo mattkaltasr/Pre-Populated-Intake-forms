@@ -170,25 +170,13 @@ const MedicalHistory = ({ selectedPatientId }) => {
         },
       });
 
+      /** TODO: implement */
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "healthhabits",
         setLoading,
         setData: (data) => {
           const result = data || [];
-          // console.log("healthhabits: ", data);
-
-          if (result) {
-            console.log("healthabits: ", result);
-            // setAnswersMedications({
-            //   ...patientAnswersMedications,
-            //   medications: result,
-            // });
-            // setPatientDataMedications({
-            //   ...patientDataMedications,
-            //   medications: result,
-            // });
-          }
         },
       });
 
@@ -220,17 +208,6 @@ const MedicalHistory = ({ selectedPatientId }) => {
       ...patientAnswersConditions,
       conditions: {
         ...(patientAnswersConditions.conditions || {}),
-        [key]: value,
-      },
-    });
-    setIsSubmitted(false);
-  };
-
-  const setSurgicalValue = (key, value) => {
-    setAnswersSurgical({
-      ...patientAnswersSurgical,
-      surgical: {
-        ...(patientAnswersSurgical.surgical || {}),
         [key]: value,
       },
     });
