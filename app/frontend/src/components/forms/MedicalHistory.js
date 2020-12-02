@@ -307,7 +307,11 @@ const MedicalHistory = ({ selectedPatientId }) => {
               className="flex"
               style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
             >
-              <MedicationAllergies />
+              <MedicationAllergies
+                medicationAllergies={
+                  patientAnswersMedicationAllergies.allergies || []
+                }
+              />
               <SurgicalHistory
                 patientAnswersSurgical={patientAnswersSurgical}
               />

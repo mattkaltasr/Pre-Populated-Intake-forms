@@ -1,9 +1,22 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable react/prop-types */
 import React from "react";
-import PropTypes from "prop-types";
+
 import _ from "lodash";
 import TableRow from "./TableRow";
 
-const MedicationAllergies = ({ setMedicationValue, patientMedications }) => {
+const MedicationAllergies = ({ medicationAllergies }) => {
+  console.log(medicationAllergies);
+
+  const sliced = medicationAllergies.slice(
+    Math.max(medicationAllergies.length - 3, 0)
+  );
+
+  const normalized =
+    sliced.length < 3
+      ? [...sliced, ..._.range(0, 3 - sliced.length).map(() => ({}))]
+      : sliced;
+
   return (
     <div
       className="flex flex-col"
@@ -43,32 +56,22 @@ const MedicationAllergies = ({ setMedicationValue, patientMedications }) => {
             <strong>Reaction</strong>
           </div>
         </div>
-        <TableRow
-          rowData={[
-            { field: "medication", value: "N/A" },
-            { field: "Reaction", value: "none" },
-          ]}
-        />
-        <TableRow
-          rowData={[
-            { field: "medication", value: "N/A" },
-            { field: "Reaction", value: "none" },
-          ]}
-        />
-        <TableRow
-          rowData={[
-            { field: "medication", value: "N/A" },
-            { field: "Reaction", value: "none" },
-          ]}
-        />
+        {normalized.map((s, idx) => (
+          <TableRow
+            key={idx}
+            onChange={() => {}}
+            rowData={[
+              { field: "medication", value: _.get(s.medication, "display") },
+              {
+                field: "reaction",
+                value: _.get(s.reaction, "display", ""),
+              },
+            ]}
+          />
+        ))}
       </div>
     </div>
   );
-};
-
-MedicationAllergies.propTypes = {
-  setMedicationValue: PropTypes.func.isRequired,
-  patientMedications: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default MedicationAllergies;
