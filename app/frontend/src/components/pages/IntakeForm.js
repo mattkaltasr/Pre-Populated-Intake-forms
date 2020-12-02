@@ -10,7 +10,7 @@ const IntakeForm = ({ selectedPatientId }) => {
     <>
       <PatientInfo selectedPatientId={selectedPatientId} />
       <MedicalHistory selectedPatientId={selectedPatientId} />
-      <VisitPreparation patientData={{}} />
+      <VisitPreparation handleSubmit={() => {}} />
     </>
   );
 };

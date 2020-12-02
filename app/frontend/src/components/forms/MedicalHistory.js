@@ -170,25 +170,13 @@ const MedicalHistory = ({ selectedPatientId }) => {
         },
       });
 
+      /** TODO: implement */
       loadPatientInfoById({
         patientId: selectedPatientId,
         endpoint: "healthhabits",
         setLoading,
         setData: (data) => {
           const result = data || [];
-          // console.log("healthhabits: ", data);
-
-          if (result) {
-            console.log("healthabits: ", result);
-            // setAnswersMedications({
-            //   ...patientAnswersMedications,
-            //   medications: result,
-            // });
-            // setPatientDataMedications({
-            //   ...patientDataMedications,
-            //   medications: result,
-            // });
-          }
         },
       });
 
@@ -226,37 +214,43 @@ const MedicalHistory = ({ selectedPatientId }) => {
     setIsSubmitted(false);
   };
 
-  const setSurgicalValue = (key, value) => {
-    setAnswersSurgical({
-      ...patientAnswersSurgical,
-      surgical: {
-        ...(patientAnswersSurgical.surgical || {}),
-        [key]: value,
-      },
-    });
-    setIsSubmitted(false);
-  };
-
   /** edit a specific medication's field in array */
-  const setMedicationValue = (medicationIndex, key, value) =>
+  const setMedicationValue = (medicationIndex, key, value) => {
+    const specificKeys = {
+      condition: "display",
+      dosage: "value",
+      frequency: "frequency",
+      medication: "display",
+    };
+
+    const existing = _.get(
+      patientAnswersMedications,
+      `medications[${medicationIndex}]`,
+      {}
+    );
+
+    const updatedObj = {
+      ...existing,
+      [key]: {
+        ...(existing[key] || {}),
+        [specificKeys[key]]: value,
+      },
+    };
+
     setAnswersMedications({
       ...patientAnswersMedications,
       medications: _.get(patientAnswersMedications, "medications", [])
         .slice(0, medicationIndex)
-        .concat({
-          ..._.get(
-            patientAnswersMedications,
-            `medications[${medicationIndex}]`,
-            {}
-          ),
-          [key]: value,
-        })
+        .concat(updatedObj)
         .concat(
           _.get(patientAnswersMedications, "medications", []).slice(
             medicationIndex + 1
           )
         ),
     });
+
+    setIsSubmitted(false);
+  };
 
   return (
     <FormContainer
@@ -307,7 +301,11 @@ const MedicalHistory = ({ selectedPatientId }) => {
               className="flex"
               style={{ flexWrap: "wrap", marginBottom: "0.5em" }}
             >
-              <MedicationAllergies />
+              <MedicationAllergies
+                medicationAllergies={
+                  patientAnswersMedicationAllergies.allergies || []
+                }
+              />
               <SurgicalHistory
                 patientAnswersSurgical={patientAnswersSurgical}
               />
@@ -347,6 +345,19 @@ const MedicalHistory = ({ selectedPatientId }) => {
                 data: conditionPayload,
               });
 
+              /**
+               * then update medicines
+               */
+
+              patientAnswersMedications.medications.map((m) => {
+                return savePatientData({
+                  endpoint: `home-med/${m.id}`,
+                  patientId: selectedPatientId,
+                  asArray: true,
+                  data: m,
+                });
+              });
+
               setLoading(false);
               setIsSubmitted(true);
             }}
@@ -355,10 +366,6 @@ const MedicalHistory = ({ selectedPatientId }) => {
       }
     />
   );
-};
-
-MedicalHistory.propTypes = {
-  selectedPatientId: PropTypes.string.isRequired,
 };
 
 export default MedicalHistory;

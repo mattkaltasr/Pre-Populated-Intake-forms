@@ -18,7 +18,7 @@ const smokingOptions = [
 ];
 
 const packsOptions = ["1/4", "1/2", "1", "1.5", "2", "3"];
-const alcoholOptions = ["Yes", "No", "Quit"];
+const alcoholOptions = ["Yes", "No"];
 
 const HealthHabits = ({ setMedicationValue, patientMedications }) => {
   const [selectedSmokingOption, setSelected] = React.useState(null);
@@ -108,42 +108,7 @@ const HealthHabits = ({ setMedicationValue, patientMedications }) => {
               whiteSpace: "pre",
             }}
           >
-            Do you drink alcohol?
-          </span>
-          <div className="flex" style={{ flexWrap: "wrap" }}>
-            {alcoholOptions.map((opt) => (
-              <Checkbox
-                key={opt}
-                title={opt}
-                checked={selectedSmokingOption === opt}
-                onChange={() =>
-                  setSelected(selectedSmokingOption === opt ? null : opt)
-                }
-                style={{ ...checkboxStyle }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col">
-        <span
-          style={{
-            marginBottom: "0.25em",
-            fontSize: "0.85em",
-            fontWeight: 500,
-          }}
-        >
-          Recreational Drug Use
-        </span>
-        <div className="flex">
-          <span
-            style={{
-              fontSize: "0.8em",
-              margin: "0 1em auto 0",
-              whiteSpace: "pre",
-            }}
-          >
-            Do you use recreational drugs?
+            Do you drink alcohol regularly, every week?
           </span>
           <div className="flex" style={{ flexWrap: "wrap" }}>
             {alcoholOptions.map((opt) => (

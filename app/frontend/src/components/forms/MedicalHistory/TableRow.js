@@ -8,6 +8,7 @@ const TableRow = ({ header, rowData, onChange, asCheckbox }) => {
       {(rowData || []).map((r) => {
         return (
           <div
+            key={r.field}
             style={{
               flex: 1,
               display: "flex",
