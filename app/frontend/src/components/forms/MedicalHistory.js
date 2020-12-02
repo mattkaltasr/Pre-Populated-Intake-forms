@@ -215,25 +215,42 @@ const MedicalHistory = ({ selectedPatientId }) => {
   };
 
   /** edit a specific medication's field in array */
-  const setMedicationValue = (medicationIndex, key, value) =>
+  const setMedicationValue = (medicationIndex, key, value) => {
+    const specificKeys = {
+      condition: "display",
+      dosage: "value",
+      frequency: "frequency",
+      medication: "display",
+    };
+
+    const existing = _.get(
+      patientAnswersMedications,
+      `medications[${medicationIndex}]`,
+      {}
+    );
+
+    const updatedObj = {
+      ...existing,
+      [key]: {
+        ...(existing[key] || {}),
+        [specificKeys[key]]: value,
+      },
+    };
+
     setAnswersMedications({
       ...patientAnswersMedications,
       medications: _.get(patientAnswersMedications, "medications", [])
         .slice(0, medicationIndex)
-        .concat({
-          ..._.get(
-            patientAnswersMedications,
-            `medications[${medicationIndex}]`,
-            {}
-          ),
-          [key]: value,
-        })
+        .concat(updatedObj)
         .concat(
           _.get(patientAnswersMedications, "medications", []).slice(
             medicationIndex + 1
           )
         ),
     });
+
+    setIsSubmitted(false);
+  };
 
   return (
     <FormContainer
@@ -326,6 +343,19 @@ const MedicalHistory = ({ selectedPatientId }) => {
                 patientId: selectedPatientId,
                 asArray: true,
                 data: conditionPayload,
+              });
+
+              /**
+               * then update medicines
+               */
+
+              patientAnswersMedications.medications.map((m) => {
+                return savePatientData({
+                  endpoint: `home-med/${m.id}`,
+                  patientId: selectedPatientId,
+                  asArray: true,
+                  data: m,
+                });
               });
 
               setLoading(false);

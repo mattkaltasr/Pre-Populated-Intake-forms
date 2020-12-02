@@ -4,11 +4,12 @@ import _ from "lodash";
 
 import "../Medications.css";
 
-const Cell = ({ value, onChange }) => (
+const Cell = ({ value, onChange, disabled }) => (
   <div style={{ flex: 1, display: "flex", margin: "0.25em" }}>
     <input
-      style={{ width: "1em", flex: 1 }}
+      style={{ width: "1em", flex: 1, cursor: disabled ? "not-allowed" : "" }}
       value={value}
+      disabled={!!disabled}
       onChange={({ target: { value: next } }) => onChange(next)}
       className="input-field small"
     />
@@ -49,26 +50,40 @@ const Medications = ({ setMedicationValue, patientMedications }) => {
       </div>
       <div className="flex flex-col">
         {effectiveArr.map((med, idx) => {
-          const { condition, dosage, frequency, medication } = med;
+          const { condition, dosage, frequency, medication, id } = med;
+
           const key = idx;
+          const disabled = !id;
 
           return (
             <div className="flex medical-row" key={key}>
               <Cell
                 onChange={(val) => setMedicationValue(idx, "medication", val)}
-                value={medication !== undefined && medication.display !== undefined?medication.display:""}
+                value={
+                  medication !== undefined && medication.display !== undefined
+                    ? medication.display
+                    : ""
+                }
+                disabled={disabled}
               />
               <Cell
                 onChange={(val) => setMedicationValue(idx, "condition", val)}
-                value={condition !== undefined && condition.display !== undefined?condition.display:""}
+                value={
+                  condition !== undefined && condition.display !== undefined
+                    ? condition.display
+                    : ""
+                }
+                disabled={disabled}
               />
               <Cell
-                onChange={(val) => setMedicationValue(idx, "dosage", val)}
-                value={dosage !== undefined?dosage.value:""}
+                onChange={(val) => setMedicationValue(idx, "dosage", +val)}
+                value={dosage !== undefined ? dosage.value : ""}
+                disabled={disabled}
               />
               <Cell
-                onChange={(val) => setMedicationValue(idx, "frequency", val)}
-                value={frequency !== undefined?frequency.frequency:""}
+                onChange={(val) => setMedicationValue(idx, "frequency", +val)}
+                value={frequency !== undefined ? frequency.frequency : ""}
+                disabled={disabled}
               />
             </div>
           );
