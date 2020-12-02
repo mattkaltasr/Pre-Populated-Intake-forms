@@ -51,7 +51,7 @@ PEDIATRICS_AGE_LIMIT = (
 # Needed to initialize the FHIR Client later on
 smart_defaults = {
     "app_id": "pre_populated_intake_froms",
-    "api_base": "https://r3.smarthealthit.org"#"https://apps.hdap.gatech.edu/syntheticmass/baseDstu3",
+    "api_base": "https://apps.hdap.gatech.edu/syntheticmass/baseDstu3",
     # "api_base": "https://hapi.fhir.org/baseDstu3",
 }
 conditions_list = {
