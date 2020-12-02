@@ -34,25 +34,12 @@ const ConsentForm = ({ handleConsentAgree }) => {
           }}
         >
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Dolor
-            purus non enim praesent elementum facilisis leo. Sapien pellentesque
-            habitant morbi tristique senectus et netus et malesuada. Interdum
-            posuere lorem ipsum dolor. Amet consectetur adipiscing elit
-            pellentesque habitant morbi tristique. Pellentesque elit eget
-            gravida cum. Pulvinar sapien et ligula ullamcorper malesuada.
-            Venenatis cras sed felis eget velit aliquet sagittis id consectetur.
-            Ac feugiat sed lectus vestibulum mattis ullamcorper velit sed
-            ullamcorper. 
+            Information provided here will be used in diagnosis, records; examinations and claims information
+            <li><b>Treatment</b> means providing, coordinating or managing mental health care and related services.</li>
+            <li><b>Payment</b> means activities such as obtaining payment for the mental health care services I provide for you from your insurance or another third party payer.</li>
+            <li><strong>Health care operations</strong> include the business aspects of running a practice</li>
             </p>
-          <p>Faucibus purus in massa tempor. Odio facilisis mauris
-            sit amet massa vitae tortor. Velit ut tortor pretium viverra. Est
-            pellentesque elit ullamcorper dignissim cras tincidunt lobortis. Eu
-            sem integer vitae justo eget. Amet porttitor eget dolor morbi.
-            Malesuada pellentesque elit eget gravida cum. Semper feugiat nibh
-            sed pulvinar proin gravida. Nunc sed velit dignissim sodales ut.
-            Volutpat lacus laoreet non curabitur. Aliquam purus sit amet luctus
-            venenatis lectus. Cursus mattis molestie a iaculis at erat.
+          <p>Your health information is secure and protected at all times. It will not be released to anyone unauthorized. You protected health information will be used or disclosed when required by federal, state or local law
           </p>
         </div>
       </div>
