@@ -26,9 +26,13 @@ const Checkbox = ({ title, checked, onChange, ...containerProps }) => (
 );
 
 Checkbox.propTypes = {
-  title: PropTypes.string.isRequired,
   checked: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
+  title: PropTypes.string,
+};
+
+Checkbox.defaultProps = {
+  title: null,
 };
 
 export default Checkbox;

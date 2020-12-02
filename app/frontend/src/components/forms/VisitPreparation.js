@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/no-unused-prop-types */
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -127,18 +129,16 @@ const PatientInfo = ({ handleSubmit }) => {
               <div style={{ flex: 1 }}></div>
             </div>
           </div>
-          <div style={{ margin: "1em auto auto auto" }}>
-            <SubmitButton onClick={handleSubmit} />
-          </div>
+          <SubmitButton
+            style={{ margin: "1em auto auto 0", width: "10em" }}
+            text="Submit"
+            // disabled={isLoading || isSubmitted}
+            onClick={handleSubmit}
+          />
         </div>
       }
     />
   );
-};
-
-PatientInfo.propTypes = {
-  selectedPatientId: PropTypes.string.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
 };
 
 export default PatientInfo;

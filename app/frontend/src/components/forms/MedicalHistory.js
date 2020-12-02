@@ -357,8 +357,4 @@ const MedicalHistory = ({ selectedPatientId }) => {
   );
 };
 
-MedicalHistory.propTypes = {
-  selectedPatientId: PropTypes.string.isRequired,
-};
-
 export default MedicalHistory;

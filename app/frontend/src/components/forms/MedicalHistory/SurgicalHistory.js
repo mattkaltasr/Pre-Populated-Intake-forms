@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unused-prop-types */
 import React from "react";
@@ -6,7 +7,8 @@ import TableRow from "./TableRow";
 
 const SurgicalHistory = ({ patientAnswersSurgical }) => {
   const surgical = patientAnswersSurgical.surgical || [];
-  const sliced = surgical.slice(surgical.length - 3, surgical.length);
+
+  const sliced = surgical.slice(Math.max(surgical.length - 3, 0));
 
   const normalized =
     sliced.length < 3
@@ -48,10 +50,10 @@ const SurgicalHistory = ({ patientAnswersSurgical }) => {
             <strong>Year</strong>
           </div>
         </div>
-        {normalized.map((s) => {
+        {normalized.map((s, idx) => {
           return (
             <TableRow
-              key={s.code}
+              key={`${s.code}-${idx}`}
               onChange={() => {}}
               rowData={[
                 { field: "code", value: s.display, disabled: true },

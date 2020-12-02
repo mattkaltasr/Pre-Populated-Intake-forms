@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import _ from "lodash";
 
@@ -20,10 +21,9 @@ const HeaderCell = ({ title }) => (
 
 const FamilyMedicalHistory = ({ medicalHistory }) => {
   const byFamilyMember = _.groupBy(medicalHistory, (m) =>
-    _.get(m.brief, "relationship")
+    _.get(m, "relationship")
   );
 
-  console.log(byFamilyMember);
   return (
     <div className="flex flex-col">
       <strong style={{ flex: 1, fontSize: "0.85em", marginBottom: "0.5em" }}>
@@ -63,25 +63,25 @@ const FamilyMedicalHistory = ({ medicalHistory }) => {
                   {
                     field: "mother",
                     value: !!(byFamilyMember.mother || []).find(
-                      (d) => d.details.code === m.code
+                      (d) => d.condition.code === m.code
                     ),
                   },
                   {
                     field: "father",
                     value: !!(byFamilyMember.father || []).find(
-                      (d) => d.details.code === m.code
+                      (d) => d.condition.code === m.code
                     ),
                   },
                   {
                     field: "brother",
                     value: !!(byFamilyMember.brother || []).find(
-                      (d) => d.details.code === m.code
+                      (d) => d.condition.code === m.code
                     ),
                   },
                   {
                     field: "sister",
                     value: !!(byFamilyMember.sister || []).find(
-                      (d) => d.details.code === m.code
+                      (d) => d.condition.code === m.code
                     ),
                   },
                 ]}
