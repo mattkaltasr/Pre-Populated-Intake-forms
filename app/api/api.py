@@ -411,30 +411,54 @@ def getHealthHabitsForPatient(id):
     Get health habit Observations by patient id
     """
     try:
-        results = []
-        o_search = Observation.where(struct={"subject": "Patient/" + str(id)})
-        o_observation = o_search.perform_resources(smart.server)
-        print(id)
-        print(o_observation)
-        for obs in o_observation:
-            if (obs.code.coding[0].system == "http://loinc.org") and (
-                obs.code.coding[0].code == "72166-2"
-            ):
-                # Shows nominal codes underneath smoking status https://loinc.org/72166-2/
-                code = obs.valueCodeableConcept.coding[0].code
-                display = obs.valueCodeableConcept.coding[0].display
-                results.append({"smokingStatus": {"code": code, "display": display}})
-            elif (obs.code.coding[0].system == "http://loinc.org") and (
-                obs.code.coding[0].code == "8663-7"
-            ):
-                value = obs.valueQuantity.value
-                results.append({"smokingRate": {"value": value}})
-            elif (obs.code.coding[0].system == "http://acme-rehab.org") and (
-                obs.code.coding[0].code == "alcohol-type"
-            ):
-                # https://hl7.org/fhir/2018May/observation-example-alcohol-type.html
-                results.append({"useAlcohol": True})
-        return jsonify(results)
+        result = {
+            "smoking-status": "",
+            "packs-per-day": "",
+            "drinking-status": ""
+        }
+        search_latest_smoking_status = Observation.where({
+            'subject': f'Patient/{id}',
+            'code': 'http://loinc.org|72166-2',
+            '_count': '1',
+            '_sort': '-date'
+        })
+        search_latest_packs_per_day = Observation.where({
+            'subject': f'Patient/{id}',
+            'code': 'http://loinc.org|8663-7',
+            '_count': '1',
+            '_sort': '-date'
+        })
+        search_latest_drinking_status = Observation.where({
+            'subject': f'Patient/{id}',
+            'code': 'http://loinc.org|67743-5',
+            '_count': '1',
+            '_sort': '-date'
+        })
+        latest_smoking_status_observation = search_latest_smoking_status.perform_resources(smart.server)
+        latest_packs_per_day_observation = search_latest_packs_per_day.perform_resources(smart.server)
+        latest_drinking_status_observation = search_latest_drinking_status.perform_resources(smart.server)
+        for obs in latest_smoking_status_observation: # only one entry is expected because of the count=1 parameter
+            if obs.valueCodeableConcept:
+                if obs.valueCodeableConcept.text:
+                    result["smoking-status"] = obs.valueCodeableConcept.text
+                else:
+                    if obs.valueCodeableConcept.coding and len(obs.valueCodeableConcept.coding) > 0:
+                        if obs.valueCodeableConcept.coding[0].display:
+                            result["smoking-status"] = obs.valueCodeableConcept.coding[0].display
+        for obs in latest_packs_per_day_observation: # only one entry is expected because of the count=1 parameter
+            obs: Observation
+            if obs.valueQuantity:
+                if obs.valueQuantity.value:
+                    result["packs-per-day"] = f'{obs.valueQuantity.value}'
+        for obs in latest_drinking_status_observation: # only one entry is expected because of the count=1 parameter
+            if obs.valueCodeableConcept:
+                if obs.valueCodeableConcept.text:
+                    result["drinking-status"] = obs.valueCodeableConcept.text
+                else:
+                    if obs.valueCodeableConcept.coding and len(obs.valueCodeableConcept.coding) > 0:
+                        if obs.valueCodeableConcept.coding[0].display:
+                            result["drinking-status"] = obs.valueCodeableConcept.coding[0].display
+        return jsonify(result)
 
     except FHIRValidationError:
         # The server should probably return a more adequate HTTP error code here instead of a 200 OK.
