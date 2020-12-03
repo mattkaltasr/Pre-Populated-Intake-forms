@@ -1,0 +1,238 @@
+{
+	"info": {
+		"_postman_id": "bbb2e616-81df-4ac5-9578-f8cc84e1be64",
+		"name": "Team Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "MedicationStatement - Retrieve/GET",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/home-med/7183b236-2728-44f6-b578-236253068150",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"home-med",
+						"7183b236-2728-44f6-b578-236253068150"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MedicationStatement - Create/POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"medication\": {\n        \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n        \"code\": \"564666\",\n        \"display\": \"Nitroglycerin 0.4 MG/ACTUAT [Nitrolingual]\"\n    },\n    \"condition\": {\n        \"system\": \"http://snomed.info/sct\",\n        \"code\": \"22298006\",\n        \"display\": \"Myocardial Infarction\"\n    },\n    \"dosage\": {\n        \"system\": \"http://unitsofmeasure.org\",\n        \"code\": \"541226-4\",\n        \"value\": 1,\n        \"unit\": \"doses\"\n    },\n    \"frequency\": {\n        \"frequency\": 1,\n        \"period\": 4,\n        \"periodUnit\": \"h\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/home-med/7183b236-2728-44f6-b578-236253068150",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"home-med",
+						"7183b236-2728-44f6-b578-236253068150"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AllergyIntollerance - Retrieve/GET",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/drug-allergy/7183b236-2728-44f6-b578-236253068150",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"drug-allergy",
+						"7183b236-2728-44f6-b578-236253068150"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AllergyIntollerance - Create/POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"medication\": {\n        \"code\": \"373270004\",\n        \"display\": \"Penicillin -class of antibiotic-\",\n        \"system\": \"http://snomed.info/sct\"\n    },\n    \"reaction\": {\n        \"code\": \"1160593\",\n        \"display\": \"cashew nut allergenic extract Injectable Product\",\n        \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/drug-allergy/7183b236-2728-44f6-b578-236253068150",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"drug-allergy",
+						"7183b236-2728-44f6-b578-236253068150"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Procedure - Retrieve/GET",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/procedure/7183b236-2728-44f6-b578-236253068150",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"procedure",
+						"7183b236-2728-44f6-b578-236253068150"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Procedure - Create/POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[{\n    \"code\": \"618007\",\n    \"display\": \"Frontal sinusectomy\",\n    \"date\": \"2020-11-12\"\n}]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/procedure/7183b236-2728-44f6-b578-236253068150",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"procedure",
+						"7183b236-2728-44f6-b578-236253068150"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FamilyMemberHistory - Retrieve/GET",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/family_member_history/064df7dc-ec42-416d-8563-9ea9e23fdb9d",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"family_member_history",
+						"064df7dc-ec42-416d-8563-9ea9e23fdb9d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FamilyMemberHistory - Create/POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n      \n        {\n            \"relationship\" : \"father\",\n            \"condition\": [{\n                    \"code\": \"73211009\",\n                    \"display\": \"Diabetes\",\n                    \"system\": \"http://snomed.info/sct\"\n                },\n                 {\n                    \"system\": \"http://snomed.info/sct\",\n                    \"code\": \"399068003\",\n                    \"display\": \"cancer\"\n                }]\n        },\n        {\n            \"relationship\" : \"sister\",\n            \"condition\": [{\n                    \"code\": \"73211009\",\n                    \"display\": \"Diabetes\",\n                    \"system\": \"http://snomed.info/sct\"\n                },\n                 {\n                    \"system\": \"http://snomed.info/sct\",\n                    \"code\": \"56265001\",\n                    \"display\": \"Heart disease\"\n                }]\n        }\n      \n      ]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://apps.hdap.gatech.edu/pre-populated-intake-forms-app-backend/api/family_member_history/7183b236-2728-44f6-b578-236253068150",
+					"protocol": "https",
+					"host": [
+						"apps",
+						"hdap",
+						"gatech",
+						"edu"
+					],
+					"path": [
+						"pre-populated-intake-forms-app-backend",
+						"api",
+						"family_member_history",
+						"7183b236-2728-44f6-b578-236253068150"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
