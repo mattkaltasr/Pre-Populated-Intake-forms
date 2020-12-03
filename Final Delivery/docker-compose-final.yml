@@ -1,0 +1,16 @@
+version: "2"
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8080:8080
+
+  backend:
+    restart: always
+    container_name: backend
+    build: ./api
+    expose:
+      - 8086
