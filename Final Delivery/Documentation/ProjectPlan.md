@@ -68,3 +68,6 @@
 | Developer/QA | Parul Khosla              |
 | QA           | Matthew Kalita            |
 | Mentor       | Elizabeth (Ellie) Shivers |
+- Working Agreement   
+    * Kanban board created in github and team to track the status of the tasks in the board.
+    * Team to meet once every sprint to review the work progress, blockers, mentor's feedback and sprint deliverable.

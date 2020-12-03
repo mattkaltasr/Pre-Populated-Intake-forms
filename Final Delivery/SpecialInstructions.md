@@ -35,7 +35,7 @@ Start your favorite web browser and navigate to:
 
 ### Build and deployment steps
 
-#### Python
+#### Python (Backend APIs)
 
 **Tip**: It's highly recommended that you use pipenv or virtualenv to manage your local python dependencies/environment.
 
@@ -151,44 +151,43 @@ Start your favorite web browser and navigate to:
                      "date":"2019-05-06"}
                 ]
 
-* Add (PUT) Family Medical History (Conditions)
-    `<BASE_URL>/api/family_member_history/<patient_id>`
-        
-    The endpoint expects a list of new family members with one or more conditions that need to be added to the patient
-        
-    Sample body json:
+    * Add (PUT) Family Medical History (Conditions)
+        `<BASE_URL>/api/family_member_history/<patient_id>`
+            
+        The endpoint expects a list of new family members with one or more conditions that need to be added to the patient
+            
+        Sample body json:
+                    
+                [
                 
-            [
-            
-              {
-                  "relationship" : "father",
-                  "condition": [{
-                          "code": "73211009",
-                          "display": "Diabetes",
-                          "system": "http://snomed.info/sct"
-                      },
-                       {
-                          "system": "http://snomed.info/sct",
-                          "code": "399068003",
-                          "display": "cancer"
-                      }]
-              },
-              {
-                  "relationship" : "sister",
-                  "condition": [{
-                          "code": "73211009",
-                          "display": "Diabetes",
-                          "system": "http://snomed.info/sct"
-                      },
-                       {
-                          "system": "http://snomed.info/sct",
-                          "code": "56265001",
-                          "display": "Heart disease"
-                      }]
-              }
-            
-            ]
-  
+                  {
+                      "relationship" : "father",
+                      "condition": [{
+                              "code": "73211009",
+                              "display": "Diabetes",
+                              "system": "http://snomed.info/sct"
+                          },
+                           {
+                              "system": "http://snomed.info/sct",
+                              "code": "399068003",
+                              "display": "cancer"
+                          }]
+                  },
+                  {
+                      "relationship" : "sister",
+                      "condition": [{
+                              "code": "73211009",
+                              "display": "Diabetes",
+                              "system": "http://snomed.info/sct"
+                          },
+                           {
+                              "system": "http://snomed.info/sct",
+                              "code": "56265001",
+                              "display": "Heart disease"
+                          }]
+                  }
+                
+                ]
 #### Frontend
 
 1. Run the following commands:
@@ -203,14 +202,4 @@ Start your favorite web browser and navigate to:
 3. Run the UI using following command
 
         yarn start
-4. Open any browser and go to http://localhost:3000/    
-    
-
-## Authors
-
-- Marouane Marzouki ([mmarzouki3@gatech.edu](mailto:mmarzouki3@gatech.edu))
-- Matthew Kalita ([mkalita6@gatech.edu](mailto:mkalita6@gatech.edu))
-- Ed Hayes ([ehayes9@gatech.edu](mailto:ehayes9@gatech.edu))
-- Anthony Bosshardt ([abosshardt6@gatech.edu](mailto:abosshardt6@gatech.edu))
-- Parul Khosla ([pkhosla3@gatech.edu](mailto:pkhosla3@gatech.edu))
-- Daniel Arch ([darch3@gatech.edu](mailto:darch3@gatech.edu))
+4. Open any browser and go to http://localhost:3000/
